@@ -1,0 +1,20 @@
+<article class="group bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-sm transition">
+  {% if post.cover_image_url %}
+    <a href="/blog/{{ post.slug }}" class="block aspect-[16/9] overflow-hidden bg-gray-100">
+      <img src="{{ post.cover_image_url }}" alt="{{ post.title }}" loading="lazy"
+           class="w-full h-full object-cover group-hover:scale-[1.02] transition" />
+    </a>
+  {% endif %}
+  <div class="p-5">
+    <p class="text-xs text-gray-400">
+      {{ (post.published_at or post.created_at) | format_date }}
+      {% if post.author %} &middot; {{ post.author.full_name or post.author.username }}{% endif %}
+    </p>
+    <h3 class="mt-2 text-lg font-semibold leading-snug">
+      <a href="/blog/{{ post.slug }}" class="hover:text-accent">{{ post.title }}</a>
+    </h3>
+    {% if post.excerpt %}
+      <p class="mt-2 text-sm text-gray-500 line-clamp-3">{{ post.excerpt }}</p>
+    {% endif %}
+  </div>
+</article>
