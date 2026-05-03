@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{# Layout interno del area admin con sidebar simple. #}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+  <div class="grid gap-8 md:grid-cols-[200px_1fr]">
+
+    <aside class="md:sticky md:top-24 self-start">
+      <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">Panel</p>
+      <nav class="flex md:flex-col gap-1 text-sm">
+        <a href="/admin"
+           class="px-3 py-2 rounded {% if request.url.path == '/admin' or request.url.path == '/admin/' %}bg-black text-white{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+          Dashboard
+        </a>
+        <a href="/admin/posts"
+           class="px-3 py-2 rounded {% if request.url.path.startswith('/admin/posts') %}bg-black text-white{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+          Posts
+        </a>
+        <a href="/auth/logout" class="px-3 py-2 rounded text-gray-500 hover:bg-gray-50 mt-4">
+          Cerrar sesion
+        </a>
+      </nav>
+      <div class="mt-6 text-xs text-gray-400 hidden md:block">
+        <p>{{ user.full_name or user.username }}</p>
+        <p class="mt-1 inline-block px-2 py-0.5 rounded bg-gray-100">{{ user.role }}</p>
+      </div>
+    </aside>
+
+    <section>
+      {% block admin_content %}{% endblock %}
+    </section>
+  </div>
+</div>
+{% endblock %}
