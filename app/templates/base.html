@@ -19,18 +19,27 @@
   {% if og_image %}<meta property="og:image" content="{{ og_image }}" />{% endif %}
   <meta name="twitter:card" content="summary_large_image" />
 
-  {# --- Pre-aplicar tema antes de pintar (evita FOUC) --- #}
+  {# --- Tema: pre-paint y toggle global (vanilla, no depende de Alpine) --- #}
   <script>
     (function () {
       var root = document.documentElement;
-      try {
-        var t = localStorage.getItem('theme');
-        if (!t) t = 'dark';
+      function getStoredTheme() {
+        try { return localStorage.getItem('theme'); } catch (e) { return null; }
+      }
+      function applyTheme(t) {
+        if (t !== 'light' && t !== 'dark') t = 'dark';
         root.classList.toggle('dark',  t === 'dark');
         root.classList.toggle('light', t === 'light');
-      } catch (e) {
-        root.classList.add('dark');
+        try { localStorage.setItem('theme', t); } catch (e) {}
+        try { window.dispatchEvent(new CustomEvent('theme-changed', { detail: t })); } catch (e) {}
       }
+      window.__applyTheme = applyTheme;
+      window.__toggleTheme = function () {
+        var current = root.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      };
+      // Pre-paint
+      applyTheme(getStoredTheme() || 'dark');
     })();
   </script>
 
@@ -218,6 +227,13 @@
     .dark .prose-content pre { background: #06060a; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.06); }
     .dark .prose-content blockquote { color: #cbd5e1; }
 
+    /* Iconos del toggle de tema (CSS-only, no depende de Alpine) */
+    .icon-sun, .icon-moon { display: none; }
+    .dark  .icon-sun  { display: inline-block; }
+    .light .icon-moon { display: inline-block; }
+    /* Fallback si por alguna razon no hay clase .light ni .dark */
+    html:not(.dark):not(.light) .icon-sun { display: inline-block; }
+
     /* Scrollbar (default = light) */
     ::-webkit-scrollbar { width: 10px; height: 10px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -232,20 +248,7 @@
 <body class="h-full antialiased flex flex-col min-h-screen
              bg-white text-slate-900
              dark:bg-ink-850 dark:text-slate-100
-             transition-colors duration-300"
-      x-data="{
-        theme: (localStorage.getItem('theme') || 'dark'),
-        toggle() {
-          this.theme = this.theme === 'dark' ? 'light' : 'dark';
-          localStorage.setItem('theme', this.theme);
-          document.documentElement.classList.toggle('dark', this.theme === 'dark');
-          document.documentElement.classList.toggle('light', this.theme === 'light');
-        },
-        init() {
-          document.documentElement.classList.toggle('dark', this.theme === 'dark');
-          document.documentElement.classList.toggle('light', this.theme === 'light');
-        }
-      }">
+             transition-colors duration-300">
 
   {# --- Header --- #}
   <header class="sticky top-0 z-40 backdrop-blur-xl
@@ -270,12 +273,12 @@
         <a href="/blog" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Blog</a>
 
         {# --- Toggle tema --- #}
-        <button @click="toggle()" type="button" aria-label="Cambiar tema"
+        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema"
                 class="ml-2 p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition">
-          <svg x-show="theme === 'dark'"  xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+          <svg class="icon-sun w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
           </svg>
-          <svg x-show="theme === 'light'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" style="display:none">
+          <svg class="icon-moon w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
           </svg>
         </button>
@@ -293,12 +296,12 @@
 
       {# --- Mobile menu --- #}
       <div class="md:hidden flex items-center gap-1" x-data="{ open: false }">
-        <button @click="toggle()" type="button" aria-label="Cambiar tema"
+        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema"
                 class="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition">
-          <svg x-show="theme === 'dark'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+          <svg class="icon-sun w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
           </svg>
-          <svg x-show="theme === 'light'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" style="display:none">
+          <svg class="icon-moon w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
           </svg>
         </button>
