@@ -59,15 +59,14 @@ USER app
 
 EXPOSE 8000
 
-# Healthcheck simple contra la ruta publica /healthz
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-    CMD curl -fsS http://localhost:${PORT}/healthz || exit 1
-
 # Gunicorn + UvicornWorker para produccion
 CMD ["gunicorn", "app.main:app", \
      "--workers", "3", \
      "--worker-class", "uvicorn.workers.UvicornWorker", \
      "--bind", "0.0.0.0:8000", \
+     "--timeout", "120", \
+     "--graceful-timeout", "30", \
+     "--keep-alive", "5", \
      "--access-logfile", "-", \
      "--error-logfile", "-", \
      "--forwarded-allow-ips", "*"]
