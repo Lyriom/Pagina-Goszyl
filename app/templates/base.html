@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ page_title or app_name }}</title>
+
+  {# --- SEO basico --- #}
+  <meta name="description" content="{{ page_description or app_description }}" />
+  <link rel="canonical" href="{{ canonical_url or (app_url + request.url.path) }}" />
+
+  {# --- Open Graph / Twitter --- #}
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{{ page_title or app_name }}" />
+  <meta property="og:description" content="{{ page_description or app_description }}" />
+  <meta property="og:url" content="{{ canonical_url or (app_url + request.url.path) }}" />
+  {% if og_image %}<meta property="og:image" content="{{ og_image }}" />{% endif %}
+  <meta name="twitter:card" content="summary_large_image" />
+
+  {# --- Tailwind via CDN (sin build step) --- #}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: { accent: { DEFAULT: '#2563eb', dark: '#1d4ed8' } }
+        }
+      }
+    };
+  </script>
+
+  {# --- Inter (Google Fonts) --- #}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  {# --- HTMX + Alpine.js --- #}
+  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .prose-content h1, .prose-content h2, .prose-content h3 { font-weight: 600; margin-top: 1.5em; margin-bottom: 0.6em; }
+    .prose-content h1 { font-size: 1.875rem; }
+    .prose-content h2 { font-size: 1.5rem; }
+    .prose-content h3 { font-size: 1.25rem; }
+    .prose-content p  { margin: 1em 0; line-height: 1.75; }
+    .prose-content a  { color: #2563eb; text-decoration: underline; }
+    .prose-content ul, .prose-content ol { margin: 1em 0 1em 1.5em; }
+    .prose-content code { background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
+    .prose-content pre  { background: #0f172a; color: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+    .prose-content pre code { background: transparent; color: inherit; padding: 0; }
+    .prose-content img { max-width: 100%; border-radius: 8px; margin: 1.5em 0; }
+    .prose-content blockquote { border-left: 3px solid #e5e7eb; padding-left: 1rem; color: #4b5563; font-style: italic; margin: 1.25em 0; }
+  </style>
+
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="h-full bg-white text-[#1a1a1a] antialiased flex flex-col min-h-screen">
+
+  {# --- Header --- #}
+  <header class="border-b border-gray-100 bg-white/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="/" class="text-lg font-semibold tracking-tight">{{ app_name }}</a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm text-gray-600">
+        <a href="/" class="hover:text-black transition">Inicio</a>
+        <a href="/acerca" class="hover:text-black transition">Acerca</a>
+        <a href="/blog" class="hover:text-black transition">Blog</a>
+        {% if user %}
+          <a href="/admin" class="hover:text-black transition">Admin</a>
+          <a href="/auth/logout" class="text-gray-500 hover:text-black transition">Salir</a>
+        {% else %}
+          <a href="/auth/login" class="px-3 py-1.5 rounded-md bg-black text-white hover:bg-gray-800 transition">Acceder</a>
+        {% endif %}
+      </nav>
+
+      {# --- Mobile menu --- #}
+      <div class="md:hidden" x-data="{ open: false }">
+        <button @click="open = !open" class="p-2 -mr-2" aria-label="Menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <div x-show="open" x-transition @click.outside="open = false"
+             class="absolute right-4 top-14 w-56 bg-white border border-gray-100 rounded-lg shadow-lg p-2 text-sm">
+          <a href="/" class="block px-3 py-2 rounded hover:bg-gray-50">Inicio</a>
+          <a href="/acerca" class="block px-3 py-2 rounded hover:bg-gray-50">Acerca</a>
+          <a href="/blog" class="block px-3 py-2 rounded hover:bg-gray-50">Blog</a>
+          {% if user %}
+            <a href="/admin" class="block px-3 py-2 rounded hover:bg-gray-50">Admin</a>
+            <a href="/auth/logout" class="block px-3 py-2 rounded hover:bg-gray-50">Salir</a>
+          {% else %}
+            <a href="/auth/login" class="block px-3 py-2 rounded hover:bg-gray-50">Acceder</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {# --- Toast container (HTMX/Alpine) --- #}
+  <div id="toast-region"
+       x-data="{ msgs: [] }"
+       @toast.window="msgs.push($event.detail); setTimeout(() => msgs.shift(), 4000)"
+       class="fixed top-20 right-4 z-50 space-y-2">
+    <template x-for="(m, i) in msgs" :key="i">
+      <div class="bg-black text-white text-sm px-4 py-2 rounded-md shadow-lg" x-text="m"></div>
+    </template>
+  </div>
+
+  {# --- Main --- #}
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {# --- Footer --- #}
+  <footer class="mt-20 border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid gap-8 md:grid-cols-3 text-sm text-gray-500">
+      <div>
+        <p class="font-semibold text-black">{{ app_name }}</p>
+        <p class="mt-2">{{ app_description }}</p>
+      </div>
+      <div>
+        <p class="font-medium text-gray-700">Navegacion</p>
+        <ul class="mt-2 space-y-1">
+          <li><a href="/" class="hover:text-black">Inicio</a></li>
+          <li><a href="/acerca" class="hover:text-black">Acerca</a></li>
+          <li><a href="/blog" class="hover:text-black">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="font-medium text-gray-700">Conecta</p>
+        <ul class="mt-2 space-y-1">
+          <li><a href="#" class="hover:text-black">LinkedIn</a></li>
+          <li><a href="#" class="hover:text-black">GitHub</a></li>
+          <li><a href="#" class="hover:text-black">X / Twitter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-100">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-xs text-gray-400 flex justify-between">
+        <span>&copy; {{ app_name }}. Todos los derechos reservados.</span>
+        <span>Hecho con FastAPI</span>
+      </div>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
