@@ -1,39 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="max-w-3xl mx-auto px-4 sm:px-6 py-20">
-  <p class="text-sm uppercase tracking-widest text-gray-400">Acerca de</p>
-  <h1 class="mt-3 text-4xl font-semibold tracking-tight">{{ app_name }}</h1>
+<section class="relative overflow-hidden">
+  <div class="aurora"></div>
 
-  <div class="mt-8 space-y-6 text-gray-700 leading-relaxed">
-    <p>
-      Somos un equipo enfocado en construir productos digitales con foco en seguridad,
-      escalabilidad y experiencia de usuario. Nuestro stack favorece arquitecturas
-      modernas: FastAPI, PostgreSQL, Keycloak para identidad federada y HashiCorp Vault
-      para gestion de secretos y cifrado.
-    </p>
-    <p>
-      Esta web corporativa es el punto de entrada a nuestros proyectos. Uno de ellos,
-      el comparador de cuotas, vive en su propio subdominio y se comunica con esta
-      plataforma a traves de mensajes cifrados extremo a extremo.
-    </p>
-    <p>
-      Si quieres saber mas, escribenos o sigue nuestro blog.
+  <div class="relative max-w-3xl mx-auto px-4 sm:px-6 pt-20 pb-12">
+    <p class="text-xs uppercase tracking-[0.2em] text-brand-400">Acerca de</p>
+    <h1 class="mt-3 font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-tight">
+      Somos <span class="text-gradient">{{ app_name }}</span>
+    </h1>
+    <p class="mt-5 text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+      Una consultora boutique que ayuda a empresas a automatizar procesos, capturar leads,
+      atender clientes con IA y tomar decisiones con datos.
     </p>
   </div>
+</section>
 
-  <div class="mt-12 grid gap-6 sm:grid-cols-3 text-sm">
-    <div class="border border-gray-100 rounded-lg p-5">
-      <p class="text-2xl font-semibold">+5</p>
-      <p class="text-gray-500 mt-1">Anios de experiencia</p>
+<section class="relative">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-8 text-slate-700 dark:text-slate-300 leading-relaxed">
+    <div class="glass rounded-2xl p-6 sm:p-8">
+      <h2 class="font-display text-xl font-semibold text-slate-900 dark:text-white">Que hacemos</h2>
+      <p class="mt-3">
+        Diseniamos y construimos sistemas digitales end-to-end: desde la <strong>landing page</strong> que captura
+        el lead, el <strong>chatbot</strong> que lo califica, la <strong>automatizacion</strong> que lo enruta a tu CRM,
+        hasta el <strong>dashboard</strong> que te muestra el ROI en tiempo real.
+      </p>
     </div>
-    <div class="border border-gray-100 rounded-lg p-5">
-      <p class="text-2xl font-semibold">100%</p>
-      <p class="text-gray-500 mt-1">Stack open source</p>
+
+    <div class="glass rounded-2xl p-6 sm:p-8">
+      <h2 class="font-display text-xl font-semibold text-slate-900 dark:text-white">Como lo hacemos</h2>
+      <p class="mt-3">
+        Stack moderno y open source: FastAPI, PostgreSQL, n8n, Next.js, OpenAI y Anthropic. Desplegamos en infraestructura
+        observable con autenticacion federada (Keycloak) y gestion de secretos (Vault). Sin lock-in, sin sorpresas.
+      </p>
     </div>
-    <div class="border border-gray-100 rounded-lg p-5">
-      <p class="text-2xl font-semibold">24/7</p>
-      <p class="text-gray-500 mt-1">Monitoreo activo</p>
+
+    <div class="glass rounded-2xl p-6 sm:p-8">
+      <h2 class="font-display text-xl font-semibold text-slate-900 dark:text-white">Por que somos diferentes</h2>
+      <p class="mt-3">
+        No vendemos horas: vendemos resultados medibles. Cada proyecto arranca con KPIs claros y termina con
+        documentacion, monitoreo y un equipo capaz de mantenerlo. Te dejamos autonomos, no dependientes.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="relative">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-20">
+    <div class="grid gap-4 sm:grid-cols-3">
+      <div class="glass card-hover rounded-2xl p-6 text-center">
+        <p class="font-display text-3xl font-semibold text-gradient">+5</p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Anios de experiencia</p>
+      </div>
+      <div class="glass card-hover rounded-2xl p-6 text-center">
+        <p class="font-display text-3xl font-semibold text-gradient">100%</p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Stack open source</p>
+      </div>
+      <div class="glass card-hover rounded-2xl p-6 text-center">
+        <p class="font-display text-3xl font-semibold text-gradient">24/7</p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Monitoreo activo</p>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-3">
+      <a href="mailto:hola@goszyl.com"
+         class="btn-primary px-6 py-3 rounded-lg font-medium inline-flex items-center gap-2">
+        Escribenos
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+      <a href="/blog"
+         class="px-6 py-3 rounded-lg font-medium inline-flex items-center gap-2
+                border border-slate-300 dark:border-white/10
+                text-slate-700 dark:text-slate-200
+                hover:bg-slate-100 dark:hover:bg-white/5 transition">
+        Leer el blog
+      </a>
     </div>
   </div>
 </section>

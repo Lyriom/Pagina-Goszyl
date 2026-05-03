@@ -4,26 +4,42 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-  <div class="grid gap-8 md:grid-cols-[200px_1fr]">
+  <div class="grid gap-8 md:grid-cols-[220px_1fr]">
 
     <aside class="md:sticky md:top-24 self-start">
-      <p class="text-xs uppercase tracking-widest text-gray-400 mb-3">Panel</p>
+      <p class="text-xs uppercase tracking-[0.2em] text-brand-400 mb-3">Panel</p>
       <nav class="flex md:flex-col gap-1 text-sm">
         <a href="/admin"
-           class="px-3 py-2 rounded {% if request.url.path == '/admin' or request.url.path == '/admin/' %}bg-black text-white{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+           class="px-3 py-2 rounded-lg transition
+                  {% if request.url.path == '/admin' or request.url.path == '/admin/' %}
+                    btn-primary font-medium
+                  {% else %}
+                    text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5
+                  {% endif %}">
           Dashboard
         </a>
         <a href="/admin/posts"
-           class="px-3 py-2 rounded {% if request.url.path.startswith('/admin/posts') %}bg-black text-white{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+           class="px-3 py-2 rounded-lg transition
+                  {% if request.url.path.startswith('/admin/posts') %}
+                    btn-primary font-medium
+                  {% else %}
+                    text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5
+                  {% endif %}">
           Posts
         </a>
-        <a href="/auth/logout" class="px-3 py-2 rounded text-gray-500 hover:bg-gray-50 mt-4">
+        <a href="/auth/logout"
+           class="px-3 py-2 rounded-lg text-slate-500 dark:text-slate-400
+                  hover:bg-slate-100 dark:hover:bg-white/5 mt-4 transition">
           Cerrar sesion
         </a>
       </nav>
-      <div class="mt-6 text-xs text-gray-400 hidden md:block">
-        <p>{{ user.full_name or user.username }}</p>
-        <p class="mt-1 inline-block px-2 py-0.5 rounded bg-gray-100">{{ user.role }}</p>
+      <div class="mt-6 text-xs hidden md:block">
+        <p class="text-slate-700 dark:text-slate-200 font-medium">{{ user.full_name or user.username }}</p>
+        <p class="mt-1.5 inline-block px-2 py-0.5 rounded
+                  bg-slate-100 dark:bg-white/5
+                  text-slate-600 dark:text-slate-300">
+          {{ user.role }}
+        </p>
       </div>
     </aside>
 

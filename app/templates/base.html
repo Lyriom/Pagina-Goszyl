@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full">
+<html lang="es" class="h-full scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,6 +8,8 @@
   {# --- SEO basico --- #}
   <meta name="description" content="{{ page_description or app_description }}" />
   <link rel="canonical" href="{{ canonical_url or (app_url + request.url.path) }}" />
+  <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 
   {# --- Open Graph / Twitter --- #}
   <meta property="og:type" content="website" />
@@ -17,82 +19,290 @@
   {% if og_image %}<meta property="og:image" content="{{ og_image }}" />{% endif %}
   <meta name="twitter:card" content="summary_large_image" />
 
+  {# --- Pre-aplicar tema antes de pintar (evita FOUC) --- #}
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = 'dark';
+        if (t === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
   {# --- Tailwind via CDN (sin build step) --- #}
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-          colors: { accent: { DEFAULT: '#2563eb', dark: '#1d4ed8' } }
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50:  '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81'
+            },
+            ink: {
+              900: '#06060a',
+              850: '#0a0a0f',
+              800: '#0e0e15',
+              700: '#13131c',
+              600: '#1a1a26',
+              500: '#22222f'
+            }
+          },
+          boxShadow: {
+            glow: '0 0 60px -10px rgba(99, 102, 241, 0.45)',
+            soft: '0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px -8px rgba(0,0,0,0.4)'
+          },
+          backgroundImage: {
+            'grid-dark': "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+            'grid-light': "linear-gradient(rgba(0,0,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px)"
+          },
+          keyframes: {
+            float: {
+              '0%,100%': { transform: 'translateY(0px)' },
+              '50%':     { transform: 'translateY(-12px)' }
+            },
+            shine: {
+              '0%':   { backgroundPosition: '0% 50%' },
+              '100%': { backgroundPosition: '200% 50%' }
+            }
+          },
+          animation: {
+            float: 'float 7s ease-in-out infinite',
+            shine: 'shine 6s linear infinite'
+          }
         }
       }
     };
   </script>
 
-  {# --- Inter (Google Fonts) --- #}
+  {# --- Fuentes --- #}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 
   {# --- HTMX + Alpine.js --- #}
   <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
   <style>
+    :root { color-scheme: light dark; }
     body { font-family: 'Inter', system-ui, sans-serif; }
-    .prose-content h1, .prose-content h2, .prose-content h3 { font-weight: 600; margin-top: 1.5em; margin-bottom: 0.6em; }
+
+    /* Texto con gradiente */
+    .text-gradient {
+      background: linear-gradient(90deg, #818cf8 0%, #c084fc 35%, #22d3ee 70%, #818cf8 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shine 8s linear infinite;
+    }
+
+    /* Aurora / orbes de fondo */
+    .aurora {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .aurora::before,
+    .aurora::after {
+      content: "";
+      position: absolute;
+      width: 60vmax;
+      height: 60vmax;
+      border-radius: 50%;
+      filter: blur(110px);
+      opacity: 0.55;
+      will-change: transform;
+    }
+    .aurora::before {
+      top: -25%;
+      left: -15%;
+      background: radial-gradient(circle at 30% 30%, #6366f1 0%, transparent 60%);
+      animation: float 9s ease-in-out infinite;
+    }
+    .aurora::after {
+      bottom: -30%;
+      right: -20%;
+      background: radial-gradient(circle at 70% 70%, #22d3ee 0%, transparent 60%);
+      animation: float 11s ease-in-out infinite reverse;
+    }
+    .light .aurora::before { opacity: 0.25; }
+    .light .aurora::after  { opacity: 0.20; }
+
+    /* Tarjetas glass */
+    .glass {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(8px);
+    }
+    .light .glass {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(15,23,42,0.08);
+      backdrop-filter: blur(8px);
+    }
+
+    /* Borde con gradiente al hover */
+    .card-hover {
+      position: relative;
+      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+      border-color: rgba(129, 140, 248, 0.45);
+      box-shadow: 0 0 40px -12px rgba(99, 102, 241, 0.45);
+    }
+
+    /* Boton primario brillante */
+    .btn-primary {
+      background-image: linear-gradient(120deg, #6366f1, #8b5cf6, #22d3ee, #6366f1);
+      background-size: 200% 100%;
+      animation: shine 7s linear infinite;
+      color: white;
+      box-shadow: 0 8px 24px -8px rgba(99,102,241,0.6);
+    }
+    .btn-primary:hover { filter: brightness(1.08); }
+
+    /* Prose oscuro */
+    .prose-content h1, .prose-content h2, .prose-content h3 { font-weight: 600; margin-top: 1.5em; margin-bottom: 0.6em; letter-spacing: -0.01em; }
     .prose-content h1 { font-size: 1.875rem; }
     .prose-content h2 { font-size: 1.5rem; }
     .prose-content h3 { font-size: 1.25rem; }
-    .prose-content p  { margin: 1em 0; line-height: 1.75; }
-    .prose-content a  { color: #2563eb; text-decoration: underline; }
+    .prose-content p  { margin: 1em 0; line-height: 1.8; }
+    .prose-content a  { color: #a5b4fc; text-decoration: underline; text-underline-offset: 3px; }
     .prose-content ul, .prose-content ol { margin: 1em 0 1em 1.5em; }
-    .prose-content code { background: #f3f4f6; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
-    .prose-content pre  { background: #0f172a; color: #f1f5f9; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+    .prose-content code { background: rgba(255,255,255,0.06); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    .prose-content pre  { background: #06060a; color: #e2e8f0; padding: 1rem; border-radius: 10px; overflow-x: auto; border: 1px solid rgba(255,255,255,0.06); }
     .prose-content pre code { background: transparent; color: inherit; padding: 0; }
-    .prose-content img { max-width: 100%; border-radius: 8px; margin: 1.5em 0; }
-    .prose-content blockquote { border-left: 3px solid #e5e7eb; padding-left: 1rem; color: #4b5563; font-style: italic; margin: 1.25em 0; }
+    .prose-content img { max-width: 100%; border-radius: 10px; margin: 1.5em 0; }
+    .prose-content blockquote { border-left: 3px solid #6366f1; padding-left: 1rem; color: #cbd5e1; font-style: italic; margin: 1.25em 0; }
+
+    .light .prose-content a { color: #4f46e5; }
+    .light .prose-content code { background: #f1f5f9; }
+    .light .prose-content pre { background: #0f172a; color: #f1f5f9; border: none; }
+    .light .prose-content blockquote { color: #475569; border-left-color: #6366f1; }
+
+    /* Scrollbar discreta */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+    .light ::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.15); }
   </style>
 
   {% block head_extra %}{% endblock %}
 </head>
-<body class="h-full bg-white text-[#1a1a1a] antialiased flex flex-col min-h-screen">
+<body class="h-full antialiased flex flex-col min-h-screen
+             bg-white text-slate-900
+             dark:bg-ink-850 dark:text-slate-100
+             transition-colors duration-300"
+      x-data="{
+        theme: (localStorage.getItem('theme') || 'dark'),
+        toggle() {
+          this.theme = this.theme === 'dark' ? 'light' : 'dark';
+          localStorage.setItem('theme', this.theme);
+          document.documentElement.classList.toggle('dark', this.theme === 'dark');
+          document.documentElement.classList.toggle('light', this.theme === 'light');
+        },
+        init() {
+          document.documentElement.classList.toggle('dark', this.theme === 'dark');
+          document.documentElement.classList.toggle('light', this.theme === 'light');
+        }
+      }">
 
   {# --- Header --- #}
-  <header class="border-b border-gray-100 bg-white/80 backdrop-blur sticky top-0 z-40">
+  <header class="sticky top-0 z-40 backdrop-blur-xl
+                 bg-white/70 dark:bg-ink-850/70
+                 border-b border-slate-200/70 dark:border-white/5">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <a href="/" class="text-lg font-semibold tracking-tight">{{ app_name }}</a>
+      <a href="/" class="flex items-center gap-2 group">
+        <span class="relative inline-flex w-8 h-8 rounded-lg
+                     bg-gradient-to-br from-brand-500 via-fuchsia-500 to-cyan-400
+                     shadow-glow group-hover:scale-105 transition">
+          <span class="absolute inset-[2px] rounded-md bg-white dark:bg-ink-850 grid place-items-center font-display font-bold text-sm text-slate-900 dark:text-white">
+            {{ (app_name[:1] | upper) if app_name else 'G' }}
+          </span>
+        </span>
+        <span class="font-display font-semibold tracking-tight text-base">{{ app_name }}</span>
+      </a>
 
-      <nav class="hidden md:flex items-center gap-6 text-sm text-gray-600">
-        <a href="/" class="hover:text-black transition">Inicio</a>
-        <a href="/acerca" class="hover:text-black transition">Acerca</a>
-        <a href="/blog" class="hover:text-black transition">Blog</a>
+      <nav class="hidden md:flex items-center gap-1 text-sm">
+        <a href="/" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Inicio</a>
+        <a href="/#servicios" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Servicios</a>
+        <a href="/acerca" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Acerca</a>
+        <a href="/blog" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Blog</a>
+
+        {# --- Toggle tema --- #}
+        <button @click="toggle()" type="button" aria-label="Cambiar tema"
+                class="ml-2 p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+          <svg x-show="theme === 'dark'"  xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+          </svg>
+          <svg x-show="theme === 'light'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" style="display:none">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+          </svg>
+        </button>
+
         {% if user %}
-          <a href="/admin" class="hover:text-black transition">Admin</a>
-          <a href="/auth/logout" class="text-gray-500 hover:text-black transition">Salir</a>
+          <a href="/admin" class="ml-2 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Admin</a>
+          <a href="/auth/logout" class="px-3 py-2 rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-white transition">Salir</a>
         {% else %}
-          <a href="/auth/login" class="px-3 py-1.5 rounded-md bg-black text-white hover:bg-gray-800 transition">Acceder</a>
+          <a href="/auth/login"
+             class="ml-2 btn-primary px-4 py-2 rounded-md text-sm font-medium">
+            Acceder
+          </a>
         {% endif %}
       </nav>
 
       {# --- Mobile menu --- #}
-      <div class="md:hidden" x-data="{ open: false }">
-        <button @click="open = !open" class="p-2 -mr-2" aria-label="Menu">
+      <div class="md:hidden flex items-center gap-1" x-data="{ open: false }">
+        <button @click="toggle()" type="button" aria-label="Cambiar tema"
+                class="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+          <svg x-show="theme === 'dark'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+          </svg>
+          <svg x-show="theme === 'light'" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" style="display:none">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+          </svg>
+        </button>
+        <button @click="open = !open" class="p-2 -mr-1" aria-label="Menu">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
         <div x-show="open" x-transition @click.outside="open = false"
-             class="absolute right-4 top-14 w-56 bg-white border border-gray-100 rounded-lg shadow-lg p-2 text-sm">
-          <a href="/" class="block px-3 py-2 rounded hover:bg-gray-50">Inicio</a>
-          <a href="/acerca" class="block px-3 py-2 rounded hover:bg-gray-50">Acerca</a>
-          <a href="/blog" class="block px-3 py-2 rounded hover:bg-gray-50">Blog</a>
+             class="absolute right-4 top-14 w-60 rounded-xl p-2 text-sm shadow-soft
+                    bg-white dark:bg-ink-800
+                    border border-slate-200 dark:border-white/10">
+          <a href="/" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Inicio</a>
+          <a href="/#servicios" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Servicios</a>
+          <a href="/acerca" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Acerca</a>
+          <a href="/blog" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Blog</a>
           {% if user %}
-            <a href="/admin" class="block px-3 py-2 rounded hover:bg-gray-50">Admin</a>
-            <a href="/auth/logout" class="block px-3 py-2 rounded hover:bg-gray-50">Salir</a>
+            <a href="/admin" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Admin</a>
+            <a href="/auth/logout" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Salir</a>
           {% else %}
-            <a href="/auth/login" class="block px-3 py-2 rounded hover:bg-gray-50">Acceder</a>
+            <a href="/auth/login" class="block px-3 py-2 rounded mt-1 btn-primary text-center font-medium">Acceder</a>
           {% endif %}
         </div>
       </div>
@@ -105,43 +315,61 @@
        @toast.window="msgs.push($event.detail); setTimeout(() => msgs.shift(), 4000)"
        class="fixed top-20 right-4 z-50 space-y-2">
     <template x-for="(m, i) in msgs" :key="i">
-      <div class="bg-black text-white text-sm px-4 py-2 rounded-md shadow-lg" x-text="m"></div>
+      <div class="px-4 py-2 rounded-md shadow-lg text-sm
+                  bg-slate-900 text-white dark:bg-white dark:text-slate-900" x-text="m"></div>
     </template>
   </div>
 
   {# --- Main --- #}
-  <main class="flex-1">
+  <main class="flex-1 relative">
     {% block content %}{% endblock %}
   </main>
 
   {# --- Footer --- #}
-  <footer class="mt-20 border-t border-gray-100">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 grid gap-8 md:grid-cols-3 text-sm text-gray-500">
-      <div>
-        <p class="font-semibold text-black">{{ app_name }}</p>
-        <p class="mt-2">{{ app_description }}</p>
+  <footer class="mt-24 border-t border-slate-200 dark:border-white/5 relative overflow-hidden">
+    <div class="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-14 grid gap-10 md:grid-cols-4 text-sm
+                text-slate-600 dark:text-slate-400">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2">
+          <span class="relative inline-flex w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 via-fuchsia-500 to-cyan-400">
+            <span class="absolute inset-[2px] rounded-md bg-white dark:bg-ink-850 grid place-items-center font-display font-bold text-sm text-slate-900 dark:text-white">
+              {{ (app_name[:1] | upper) if app_name else 'G' }}
+            </span>
+          </span>
+          <p class="font-display font-semibold text-base text-slate-900 dark:text-white">{{ app_name }}</p>
+        </div>
+        <p class="mt-3 max-w-sm">
+          Consultora especializada en automatizacion, landing pages, chatbots y analisis de datos.
+          Convertimos procesos manuales en sistemas que escalan.
+        </p>
       </div>
       <div>
-        <p class="font-medium text-gray-700">Navegacion</p>
-        <ul class="mt-2 space-y-1">
-          <li><a href="/" class="hover:text-black">Inicio</a></li>
-          <li><a href="/acerca" class="hover:text-black">Acerca</a></li>
-          <li><a href="/blog" class="hover:text-black">Blog</a></li>
+        <p class="font-medium text-slate-900 dark:text-white">Navegacion</p>
+        <ul class="mt-3 space-y-1.5">
+          <li><a href="/" class="hover:text-slate-900 dark:hover:text-white transition">Inicio</a></li>
+          <li><a href="/#servicios" class="hover:text-slate-900 dark:hover:text-white transition">Servicios</a></li>
+          <li><a href="/acerca" class="hover:text-slate-900 dark:hover:text-white transition">Acerca</a></li>
+          <li><a href="/blog" class="hover:text-slate-900 dark:hover:text-white transition">Blog</a></li>
         </ul>
       </div>
       <div>
-        <p class="font-medium text-gray-700">Conecta</p>
-        <ul class="mt-2 space-y-1">
-          <li><a href="#" class="hover:text-black">LinkedIn</a></li>
-          <li><a href="#" class="hover:text-black">GitHub</a></li>
-          <li><a href="#" class="hover:text-black">X / Twitter</a></li>
+        <p class="font-medium text-slate-900 dark:text-white">Conecta</p>
+        <ul class="mt-3 space-y-1.5">
+          <li><a href="#" class="hover:text-slate-900 dark:hover:text-white transition">LinkedIn</a></li>
+          <li><a href="#" class="hover:text-slate-900 dark:hover:text-white transition">GitHub</a></li>
+          <li><a href="#" class="hover:text-slate-900 dark:hover:text-white transition">X / Twitter</a></li>
         </ul>
       </div>
     </div>
-    <div class="border-t border-gray-100">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-xs text-gray-400 flex justify-between">
+    <div class="border-t border-slate-200 dark:border-white/5">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 text-xs flex flex-col sm:flex-row gap-2 justify-between
+                  text-slate-500 dark:text-slate-500">
         <span>&copy; {{ app_name }}. Todos los derechos reservados.</span>
-        <span>Hecho con FastAPI</span>
+        <span class="inline-flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Sistemas operativos
+        </span>
       </div>
     </div>
   </footer>
