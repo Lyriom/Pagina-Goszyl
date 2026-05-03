@@ -1,0 +1,101 @@
+{% extends "admin/_layout.html" %}
+
+{% block admin_content %}
+<header class="mb-8">
+  <a href="/admin/posts" class="text-sm text-gray-400 hover:text-black">&larr; Volver a posts</a>
+  <h1 class="mt-2 text-2xl font-semibold tracking-tight">
+    {% if post %}Editar post{% else %}Nuevo post{% endif %}
+  </h1>
+</header>
+
+<form method="post" action="{{ form_action }}"
+      x-data="{
+        title: {{ (post.title if post else '') | tojson }},
+        slug:  {{ (post.slug  if post else '') | tojson }},
+        slugTouched: {{ 'true' if post else 'false' }},
+        slugify(s){
+          return (s||'').toString().toLowerCase()
+            .normalize('NFD').replace(/[̀-ͯ]/g,'')
+            .replace(/[^a-z0-9\s-]/g,'')
+            .trim().replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,255);
+        }
+      }"
+      x-init="$watch('title', v => { if (!slugTouched) slug = slugify(v); })"
+      class="space-y-6">
+
+  {# --- Titulo --- #}
+  <div>
+    <label class="block text-sm font-medium mb-1">Titulo</label>
+    <input type="text" name="title" required minlength="3" maxlength="255"
+           x-model="title"
+           class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+  </div>
+
+  {# --- Slug --- #}
+  <div>
+    <label class="block text-sm font-medium mb-1">Slug</label>
+    <input type="text" name="slug" maxlength="255"
+           x-model="slug"
+           @input="slugTouched = true"
+           pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+           class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent font-mono text-sm" />
+    <p class="text-xs text-gray-400 mt-1">Se genera desde el titulo, pero puedes editarlo.</p>
+  </div>
+
+  {# --- Excerpt --- #}
+  <div>
+    <label class="block text-sm font-medium mb-1">Resumen</label>
+    <textarea name="excerpt" rows="2" maxlength="500"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent">{{ post.excerpt if post else '' }}</textarea>
+    <p class="text-xs text-gray-400 mt-1">Opcional. Aparece en la card del blog y meta description.</p>
+  </div>
+
+  {# --- Cover --- #}
+  <div>
+    <label class="block text-sm font-medium mb-1">URL de imagen de portada</label>
+    <input type="url" name="cover_image_url"
+           value="{{ post.cover_image_url if post else '' }}"
+           placeholder="https://..."
+           class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+  </div>
+
+  {# --- Contenido (Markdown) --- #}
+  <div>
+    <label class="block text-sm font-medium mb-1">Contenido (Markdown)</label>
+    <textarea name="content" required rows="18"
+              class="w-full border border-gray-200 rounded-md px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent">{{ post.content if post else '' }}</textarea>
+    <p class="text-xs text-gray-400 mt-1">Usa Markdown. Se sanitiza antes de renderizar.</p>
+  </div>
+
+  {# --- Featured toggle --- #}
+  <label class="flex items-start gap-3 p-4 border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50">
+    <input type="checkbox" name="is_featured" value="true"
+           {% if post and post.is_featured %}checked{% endif %}
+           class="mt-1" />
+    <span class="text-sm">
+      <span class="font-medium">Marcar como destacado</span>
+      <span class="block text-gray-500 mt-0.5">
+        Al publicar, se enviara un mensaje cifrado al Sistema B (comparador) para resaltar este contenido.
+      </span>
+    </span>
+  </label>
+
+  {# --- Actions --- #}
+  <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+    <button type="submit" name="action" value="draft"
+            class="px-5 py-2.5 rounded-md border border-gray-200 hover:border-gray-400 transition">
+      Guardar borrador
+    </button>
+    <button type="submit" name="action" value="publish"
+            class="px-5 py-2.5 rounded-md bg-black text-white hover:bg-gray-800 transition">
+      Publicar
+    </button>
+    {% if post %}
+      <a href="/blog/{{ post.slug }}" target="_blank"
+         class="px-5 py-2.5 rounded-md text-gray-500 hover:text-black sm:ml-auto">
+        Ver publico &rarr;
+      </a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}
