@@ -36,3 +36,5 @@ bleach==6.2.0
 
 # --- Logging ---
 loguru==0.7.3
+
+email-validator>=2.0.0
