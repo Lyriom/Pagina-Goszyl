@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+  <header class="mb-10">
+    <p class="text-sm uppercase tracking-widest text-gray-400">Blog</p>
+    <h1 class="mt-3 text-4xl font-semibold tracking-tight">Articulos recientes</h1>
+    <p class="mt-3 text-gray-500">Ideas, anuncios y aprendizajes del equipo de {{ app_name }}.</p>
+  </header>
+
+  {% if posts %}
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {% for post in posts %}
+        {% include "public/_post_card.html" %}
+      {% endfor %}
+    </div>
+
+    {# --- Paginacion --- #}
+    {% if total_pages > 1 %}
+      <nav class="mt-12 flex items-center justify-center gap-2 text-sm">
+        {% if page > 1 %}
+          <a href="/blog?page={{ page - 1 }}" class="px-3 py-1.5 border border-gray-200 rounded hover:bg-gray-50">Anterior</a>
+        {% endif %}
+        <span class="px-3 py-1.5 text-gray-500">Pagina {{ page }} de {{ total_pages }}</span>
+        {% if page < total_pages %}
+          <a href="/blog?page={{ page + 1 }}" class="px-3 py-1.5 border border-gray-200 rounded hover:bg-gray-50">Siguiente</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="text-center py-24 text-gray-400">
+      <p>Aun no hay articulos publicados.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
