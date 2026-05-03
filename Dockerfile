@@ -60,7 +60,7 @@ USER app
 EXPOSE 8000
 
 # Healthcheck simple contra la ruta publica /healthz
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
     CMD curl -fsS http://localhost:${PORT}/healthz || exit 1
 
 # Gunicorn + UvicornWorker para produccion
