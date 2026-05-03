@@ -1,0 +1,49 @@
+{% extends "admin/_layout.html" %}
+
+{% block admin_content %}
+<header class="flex items-end justify-between mb-8">
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight">Dashboard</h1>
+    <p class="text-sm text-gray-500 mt-1">Resumen del contenido del blog.</p>
+  </div>
+  <a href="/admin/posts/new" class="px-4 py-2 rounded-md bg-black text-white text-sm hover:bg-gray-800 transition">
+    Nuevo post
+  </a>
+</header>
+
+<div class="grid gap-4 sm:grid-cols-3">
+  <div class="border border-gray-100 rounded-lg p-5">
+    <p class="text-xs uppercase tracking-widest text-gray-400">Publicados</p>
+    <p class="mt-2 text-3xl font-semibold">{{ counts.published }}</p>
+  </div>
+  <div class="border border-gray-100 rounded-lg p-5">
+    <p class="text-xs uppercase tracking-widest text-gray-400">Borradores</p>
+    <p class="mt-2 text-3xl font-semibold">{{ counts.draft }}</p>
+  </div>
+  <div class="border border-gray-100 rounded-lg p-5">
+    <p class="text-xs uppercase tracking-widest text-gray-400">Total</p>
+    <p class="mt-2 text-3xl font-semibold">{{ counts.published + counts.draft }}</p>
+  </div>
+</div>
+
+<section class="mt-10">
+  <h2 class="text-sm uppercase tracking-widest text-gray-400 mb-4">Recientes</h2>
+  {% if recent_posts %}
+    <div class="border border-gray-100 rounded-lg divide-y divide-gray-100">
+      {% for post in recent_posts %}
+        <a href="/admin/posts/{{ post.id }}/edit" class="flex items-center justify-between px-4 py-3 hover:bg-gray-50">
+          <div>
+            <p class="font-medium">{{ post.title }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ post.updated_at | format_date }}</p>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded {% if post.status == 'published' %}bg-green-50 text-green-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+            {{ post.status }}
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-sm text-gray-400">Aun no has creado posts.</p>
+  {% endif %}
+</section>
+{% endblock %}
