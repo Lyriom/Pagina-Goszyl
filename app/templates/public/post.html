@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+{# --- Schema.org Article --- #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title | tojson }},
+  "description": {{ (post.excerpt or app_description) | tojson }},
+  {% if post.cover_image_url %}"image": {{ post.cover_image_url | tojson }},{% endif %}
+  "datePublished": {{ (post.published_at or post.created_at).isoformat() | tojson }},
+  "dateModified": {{ post.updated_at.isoformat() | tojson }},
+  "author": {
+    "@type": "Person",
+    "name": {{ (post.author.full_name or post.author.username) | tojson }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ app_name | tojson }}
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": {{ canonical_url | tojson }}
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+  <a href="/blog" class="text-sm text-gray-400 hover:text-black">&larr; Volver al blog</a>
+
+  <header class="mt-6 mb-10">
+    <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight leading-tight">{{ post.title }}</h1>
+    <p class="mt-4 text-sm text-gray-400">
+      {{ (post.published_at or post.created_at) | format_date }}
+      {% if post.author %} &middot; por {{ post.author.full_name or post.author.username }}{% endif %}
+    </p>
+  </header>
+
+  {% if post.cover_image_url %}
+    <img src="{{ post.cover_image_url }}" alt="{{ post.title }}"
+         class="w-full rounded-lg mb-10 aspect-[16/9] object-cover bg-gray-100" />
+  {% endif %}
+
+  <div class="prose-content text-[#1a1a1a]">
+    {{ post.content | markdown }}
+  </div>
+</article>
+{% endblock %}
