@@ -1,0 +1,52 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+.Python
+build/
+dist/
+*.so
+
+# --- Entornos virtuales ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Variables de entorno y secretos ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- IDEs / editores ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# --- Tests / cobertura ---
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Uploads en local ---
+app/static/uploads/
+
+# --- Alembic (mantener migraciones, ignorar cache) ---
+alembic/__pycache__/
+alembic/versions/__pycache__/
+
+# --- Docker ---
+docker-compose.override.yml
