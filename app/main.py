@@ -13,7 +13,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import HTTPException
-from fastapi.responses import RedirectResponse, Response
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from starlette.middleware.sessions import SessionMiddleware
@@ -96,6 +96,12 @@ async def security_headers_middleware(request: Request, call_next):
 # ---------------- Static files ----------------
 STATIC_DIR.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+# ---------------- Archivos raiz ----------------
+@app.get("/ads.txt", include_in_schema=False)
+async def ads_txt():
+    return FileResponse(str(STATIC_DIR / "ads.txt"), media_type="text/plain")
 
 
 # ---------------- Routers ----------------
