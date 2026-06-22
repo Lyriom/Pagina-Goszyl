@@ -225,7 +225,8 @@ async def maybe_sync_featured(db: AsyncSession, post: Post) -> None:
     if not (post.is_featured and post.is_published):
         return
     try:
-        result = await sistema_b_client.send_featured_post(post, db)
+        content_html = render_markdown_safe(post.content)
+        result = await sistema_b_client.send_featured_post(post, db, content_html=content_html)
         if not result.success:
             logger.warning(
                 "Sync featured a Sistema B fallo (post={} status={})",
