@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["development", "staging", "production"] = "development"
     LOG_LEVEL: str = "INFO"
 
+    # --- Override de admin por email (acceso a /admin sin depender de roles Keycloak) ---
+    # Lista separada por comas. Cualquier email aqui entra a /admin como admin.
+    ADMIN_EMAILS: str = ""
+
     # --- Sesion ---
     SECRET_KEY: str = Field(min_length=16)
     SESSION_COOKIE_NAME: str = "sistema_a_session"
@@ -65,6 +69,15 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT == "production"
+
+    @property
+    def admin_emails_set(self) -> set[str]:
+        return {e.strip().lower() for e in self.ADMIN_EMAILS.split(",") if e.strip()}
+
+    def is_admin_email(self, email: str | None) -> bool:
+        if not email:
+            return False
+        return email.strip().lower() in self.admin_emails_set
 
     @property
     def allowed_image_types_set(self) -> set[str]:

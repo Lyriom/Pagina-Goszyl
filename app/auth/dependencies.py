@@ -14,6 +14,7 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.database import get_session
 from app.schemas.user import SessionUser
 
@@ -62,6 +63,8 @@ def require_role(*roles: str) -> Callable[..., SessionUser]:
     async def _checker(
         user: Annotated[SessionUser, Depends(require_login)],
     ) -> SessionUser:
+        if settings.is_admin_email(user.email):
+            return user
         if not user.has_any_role(*roles):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
