@@ -22,13 +22,13 @@
     <text x="31" y="41" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="middle">G</text>
     <circle cx="58" cy="58" r="15" fill="#baf56a"/>
     <text x="84" y="29" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">Gozsyl</text>
-    <text x="84" y="51" fill="#8d99ab" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="2.1">SISTEMAS DIGITALES</text>
+    <text x="84" y="51" fill="#8d99ab" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">DIGITAL SYSTEMS</text>
   </g>
 
-  <text x="72" y="224" fill="#aaa1ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="3">PRODUCTO · IA · AUTOMATIZACIÓN</text>
-  <text x="72" y="307" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.5">Productos digitales que</text>
-  <text x="72" y="380" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.5">convierten complejidad en valor.</text>
-  <text x="72" y="445" fill="#9aa6b8" font-family="Arial, Helvetica, sans-serif" font-size="23">Estrategia, diseño, desarrollo y operación en un solo equipo.</text>
+  <text x="72" y="224" fill="#aaa1ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="3">DIGITAL PRODUCTS · AI · AUTOMATION</text>
+  <text x="72" y="307" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.5">Digital systems that turn</text>
+  <text x="72" y="380" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.5">complexity into real value.</text>
+  <text x="72" y="445" fill="#9aa6b8" font-family="Arial, Helvetica, sans-serif" font-size="23">Strategy, design, engineering, and operations in one team.</text>
 
   <g transform="translate(72 519)">
     <circle cx="7" cy="7" r="7" fill="#baf56a"/>

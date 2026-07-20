@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full scroll-smooth">
+<html lang="{{ locale }}" class="h-full scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,23 +7,29 @@
   <title>{{ page_title or app_name }}</title>
 
   {# Metadatos y SEO #}
-  <meta name="description" content="{{ page_description or app_description }}" />
+  <meta name="description" content="{{ page_description or organization_description }}" />
   <meta name="author" content="{{ app_name }}" />
   <meta name="robots" content="{{ 'noindex,nofollow' if request.url.path == '/_404' or (error_code | default(false)) else 'index,follow' }}" />
-  <link rel="canonical" href="{{ canonical_url or (app_url + request.url.path) }}" />
+  {% if canonical_url and not (error_code | default(false)) %}
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <link rel="alternate" hreflang="es" href="{{ app_url }}{{ language_urls.es }}" />
+  <link rel="alternate" hreflang="en" href="{{ app_url }}{{ language_urls.en }}" />
+  <link rel="alternate" hreflang="x-default" href="{{ app_url }}{{ language_urls.es }}" />
+  {% endif %}
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
   <meta name="theme-color" content="#080b12" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)" />
 
   {# Open Graph / X #}
-  <meta property="og:locale" content="es_ES" />
+  <meta property="og:locale" content="{{ og_locale }}" />
+  <meta property="og:locale:alternate" content="{{ og_locale_alternate }}" />
   <meta property="og:type" content="{{ og_type or 'website' }}" />
   <meta property="og:site_name" content="{{ app_name }}" />
   <meta property="og:title" content="{{ page_title or app_name }}" />
-  <meta property="og:description" content="{{ page_description or app_description }}" />
+  <meta property="og:description" content="{{ page_description or organization_description }}" />
   <meta property="og:url" content="{{ canonical_url or (app_url + request.url.path) }}" />
-  <meta property="og:image" content="{{ og_image or (app_url + '/static/images/gozsyl-og.png') }}" />
-  <meta property="og:image:alt" content="{{ app_name }} — producto digital, IA y automatización" />
+  <meta property="og:image" content="{{ og_image or (app_url + ('/static/images/gozsyl-og-en.png' if locale == 'en' else '/static/images/gozsyl-og.png')) }}" />
+  <meta property="og:image:alt" content="{{ t('meta.og_alt', 'Gozsyl — producto digital, IA y automatización') }}" />
   <meta name="twitter:card" content="summary_large_image" />
 
   {# Datos estructurados de la empresa #}
@@ -33,8 +39,7 @@
     "@type": "Organization",
     "name": {{ app_name | tojson }},
     "url": {{ app_url | tojson }},
-    "email": {{ contact_email | tojson }},
-    "description": {{ app_description | tojson }}
+    "description": {{ organization_description | tojson }}
   }
   </script>
 
@@ -282,29 +287,35 @@
   {% block head_extra %}{% endblock %}
 </head>
 <body class="flex min-h-screen flex-col bg-[#f7f8fb] text-slate-950 antialiased transition-colors duration-300 dark:bg-ink-850 dark:text-slate-100">
-  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <a class="skip-link" href="#contenido">{{ t('base.skip_link', 'Saltar al contenido') }}</a>
 
   <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-[#f7f8fb]/85 backdrop-blur-xl dark:border-white/[.07] dark:bg-ink-850/85">
     <div class="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-      <a href="/" class="group flex items-center gap-3" aria-label="{{ app_name }}, ir al inicio">
+      <a href="{{ urls.home }}" class="group flex items-center gap-3" aria-label="{{ t('base.home_aria', 'Gozsyl, ir al inicio') }}">
         <span class="brand-mark" aria-hidden="true">
           <span class="relative z-10 font-display text-sm font-bold">G</span>
         </span>
         <span class="leading-none">
           <span class="block font-display text-[1.05rem] font-semibold tracking-[-.03em]">{{ app_name }}</span>
-          <span class="mt-1 hidden text-[.61rem] font-semibold uppercase tracking-[.16em] text-slate-500 dark:text-slate-500 sm:block">Sistemas digitales</span>
+          <span class="mt-1 hidden text-[.61rem] font-semibold uppercase tracking-[.16em] text-slate-500 dark:text-slate-500 sm:block">{{ t('base.tagline', 'Sistemas digitales') }}</span>
         </span>
       </a>
 
-      <nav class="hidden items-center gap-1 text-sm lg:flex" aria-label="Navegación principal">
-        <a href="/#servicios" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Servicios</a>
-        <a href="/#proyectos" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Proyecto destacado</a>
-        <a href="/#proceso" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Proceso</a>
-        <a href="/acerca" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Nosotros</a>
+      <nav class="hidden items-center gap-1 text-sm lg:flex" aria-label="{{ t('base.nav_label', 'Navegación principal') }}">
+        <a href="{{ urls.home }}#servicios" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">{{ t('base.services', 'Servicios') }}</a>
+        <a href="{{ urls.home }}#proyectos" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">{{ t('base.featured_project', 'Proyecto destacado') }}</a>
+        <a href="{{ urls.home }}#proceso" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">{{ t('base.process', 'Proceso') }}</a>
+        <a href="{{ urls.about }}" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">{{ t('base.about', 'Nosotros') }}</a>
       </nav>
 
       <div class="hidden items-center gap-2 lg:flex">
-        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema de color"
+        <nav class="flex rounded-xl border border-slate-200 bg-white/70 p-1 text-xs font-bold dark:border-white/10 dark:bg-white/[.04]" aria-label="{{ t('base.language_selector', 'Selector de idioma') }}">
+          <a href="{{ language_urls.es }}" hreflang="es" lang="es" {% if locale == 'es' %}aria-current="page"{% endif %}
+             class="rounded-lg px-2.5 py-1.5 {{ 'bg-slate-950 text-white dark:bg-white dark:text-slate-950' if locale == 'es' else 'text-slate-500 hover:text-slate-950 dark:hover:text-white' }}">ES</a>
+          <a href="{{ language_urls.en }}" hreflang="en" lang="en" {% if locale == 'en' %}aria-current="page"{% endif %}
+             class="rounded-lg px-2.5 py-1.5 {{ 'bg-slate-950 text-white dark:bg-white dark:text-slate-950' if locale == 'en' else 'text-slate-500 hover:text-slate-950 dark:hover:text-white' }}">EN</a>
+        </nav>
+        <button onclick="window.__toggleTheme()" type="button" aria-label="{{ t('base.theme_toggle', 'Cambiar tema de color') }}"
                 class="grid min-h-11 min-w-11 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-900/[.05] dark:text-slate-300 dark:hover:bg-white/[.06]">
           <svg class="icon-sun h-5 w-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
@@ -313,8 +324,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
           </svg>
         </button>
-        <a href="mailto:{{ contact_email }}?subject=Nuevo%20proyecto%20para%20Gozsyl" class="btn-primary">
-          Hablemos
+        <a href="{{ urls.contact }}" class="btn-primary">
+          {{ t('base.talk', 'Hablemos') }}
           <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5"/>
           </svg>
@@ -322,7 +333,10 @@
       </div>
 
       <div class="flex items-center gap-1 lg:hidden" data-mobile-nav>
-        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema de color"
+        <a href="{{ language_urls[other_locale] }}" hreflang="{{ other_locale }}" lang="{{ other_locale }}"
+           aria-label="{{ t('base.switch_to_spanish', 'Cambiar idioma a español') if other_locale == 'es' else t('base.switch_to_english', 'Cambiar idioma a inglés') }}"
+           class="grid min-h-11 min-w-11 place-items-center rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300">{{ other_locale | upper }}</a>
+        <button onclick="window.__toggleTheme()" type="button" aria-label="{{ t('base.theme_toggle', 'Cambiar tema de color') }}"
                 class="grid min-h-11 min-w-11 place-items-center rounded-xl text-slate-600 dark:text-slate-300">
           <svg class="icon-sun h-5 w-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
@@ -332,7 +346,7 @@
           </svg>
         </button>
         <button type="button" class="grid min-h-11 min-w-11 place-items-center rounded-xl"
-                aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir o cerrar el menú" data-menu-toggle>
+                aria-expanded="false" aria-controls="menu-movil" aria-label="{{ t('base.menu_toggle', 'Abrir o cerrar el menú') }}" data-menu-toggle>
           <svg class="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-menu-open-icon>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M4 12h16M4 17h16"/>
           </svg>
@@ -342,11 +356,11 @@
         </button>
         <div id="menu-movil" hidden
              class="absolute left-4 right-4 top-[4.15rem] rounded-2xl border border-slate-200 bg-white p-2 text-sm shadow-2xl dark:border-white/10 dark:bg-ink-700">
-          <a href="/#servicios" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Servicios</a>
-          <a href="/#proyectos" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Proyecto destacado</a>
-          <a href="/#proceso" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Proceso</a>
-          <a href="/acerca" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Nosotros</a>
-          <a href="mailto:{{ contact_email }}?subject=Nuevo%20proyecto%20para%20Gozsyl" class="btn-primary mt-2 w-full">Cuéntanos tu proyecto</a>
+          <a href="{{ urls.home }}#servicios" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">{{ t('base.services', 'Servicios') }}</a>
+          <a href="{{ urls.home }}#proyectos" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">{{ t('base.featured_project', 'Proyecto destacado') }}</a>
+          <a href="{{ urls.home }}#proceso" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">{{ t('base.process', 'Proceso') }}</a>
+          <a href="{{ urls.about }}" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">{{ t('base.about', 'Nosotros') }}</a>
+          <a href="{{ urls.contact }}" class="btn-primary mt-2 w-full">{{ t('base.tell_project', 'Cuéntanos tu proyecto') }}</a>
         </div>
       </div>
     </div>
@@ -362,46 +376,42 @@
     <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/60 to-transparent"></div>
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-12 lg:px-8">
       <div class="md:col-span-6">
-        <a href="/" class="inline-flex items-center gap-3" aria-label="{{ app_name }}, ir al inicio">
+        <a href="{{ urls.home }}" class="inline-flex items-center gap-3" aria-label="{{ t('base.home_aria', 'Gozsyl, ir al inicio') }}">
           <span class="brand-mark" aria-hidden="true"><span class="relative z-10 font-display text-sm font-bold">G</span></span>
           <span class="font-display text-lg font-semibold">{{ app_name }}</span>
         </a>
         <p class="mt-4 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-400">
-          Diseñamos productos digitales, automatizaciones y sistemas de datos que convierten retos y procesos complejos en herramientas claras y útiles.
-        </p>
-        <p class="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
-          <span class="h-1.5 w-1.5 rounded-full bg-signal"></span>
-          Empresa constituida en {{ company_jurisdiction }}
+          {{ t('base.footer_copy', 'Diseñamos productos digitales, automatizaciones y sistemas de datos que convierten retos y procesos complejos en herramientas claras y útiles.') }}
         </p>
       </div>
 
       <div class="md:col-span-3">
-        <p class="text-sm font-semibold text-slate-950 dark:text-white">Explora</p>
+        <p class="text-sm font-semibold text-slate-950 dark:text-white">{{ t('base.explore', 'Explora') }}</p>
         <ul class="mt-4 space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
-          <li><a href="/#servicios" class="transition hover:text-brand-600 dark:hover:text-brand-300">Servicios</a></li>
-          <li><a href="/#proyectos" class="transition hover:text-brand-600 dark:hover:text-brand-300">Proyecto destacado</a></li>
-          <li><a href="/#proceso" class="transition hover:text-brand-600 dark:hover:text-brand-300">Proceso</a></li>
-          <li><a href="/acerca" class="transition hover:text-brand-600 dark:hover:text-brand-300">Nosotros</a></li>
+          <li><a href="{{ urls.home }}#servicios" class="transition hover:text-brand-600 dark:hover:text-brand-300">{{ t('base.services', 'Servicios') }}</a></li>
+          <li><a href="{{ urls.home }}#proyectos" class="transition hover:text-brand-600 dark:hover:text-brand-300">{{ t('base.featured_project', 'Proyecto destacado') }}</a></li>
+          <li><a href="{{ urls.home }}#proceso" class="transition hover:text-brand-600 dark:hover:text-brand-300">{{ t('base.process', 'Proceso') }}</a></li>
+          <li><a href="{{ urls.about }}" class="transition hover:text-brand-600 dark:hover:text-brand-300">{{ t('base.about', 'Nosotros') }}</a></li>
         </ul>
       </div>
 
       <div class="md:col-span-3">
-        <p class="text-sm font-semibold text-slate-950 dark:text-white">Contacto</p>
-        <a href="mailto:{{ contact_email }}" class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200">
-          {{ contact_email }}
+        <p class="text-sm font-semibold text-slate-950 dark:text-white">{{ t('base.contact', 'Contacto') }}</p>
+        <a href="{{ urls.contact }}" class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200">
+          {{ t('base.open_contact', 'Abrir formulario de contacto') }}
           <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17 17 7m0 0H8m9 0v9"/>
           </svg>
         </a>
-        <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">Cuéntanos qué quieres mejorar y te responderemos con un siguiente paso claro.</p>
-        <button type="button" data-open-consent class="mt-4 block text-left text-xs text-slate-400 transition hover:text-slate-700 dark:hover:text-slate-200">Preferencias de medición</button>
+        <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">{{ t('base.contact_intro', 'Cuéntanos qué quieres mejorar y te responderemos con un siguiente paso claro.') }}</p>
+        <button type="button" data-open-consent class="mt-4 block text-left text-xs text-slate-400 transition hover:text-slate-700 dark:hover:text-slate-200">{{ t('base.analytics_preferences', 'Preferencias de medición') }}</button>
       </div>
     </div>
 
     <div class="border-t border-slate-200/80 dark:border-white/[.07]">
       <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-        <span>&copy; {{ current_year }} {{ app_name }}. Todos los derechos reservados.</span>
-        <span>Producto, diseño y tecnología con intención.</span>
+        <span>&copy; {{ current_year }} {{ app_name }}. {{ t('base.rights', 'Todos los derechos reservados.') }}</span>
+        <span>{{ t('base.footer_tagline', 'Producto, diseño y tecnología con intención.') }}</span>
       </div>
     </div>
   </footer>
@@ -410,14 +420,14 @@
          class="fixed inset-x-4 bottom-4 z-[60] mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-white/10 dark:bg-ink-700 sm:p-6">
     <div class="sm:flex sm:items-center sm:gap-6">
       <div class="flex-1">
-        <p id="analytics-consent-title" class="font-display text-base font-semibold">Tu privacidad, primero</p>
+        <p id="analytics-consent-title" class="font-display text-base font-semibold">{{ t('base.privacy_title', 'Tu privacidad, primero') }}</p>
         <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-          Activamos la medición del sitio únicamente si nos das permiso. Las funciones esenciales siempre están disponibles.
+          {{ t('base.privacy_copy', 'Activamos la medición del sitio únicamente si nos das permiso. Las funciones esenciales siempre están disponibles.') }}
         </p>
       </div>
       <div class="mt-4 flex flex-col gap-2 sm:mt-0 sm:shrink-0">
-        <button type="button" data-consent-choice="granted" class="btn-primary">Permitir medición</button>
-        <button type="button" data-consent-choice="denied" class="btn-secondary">Solo necesarias</button>
+        <button type="button" data-consent-choice="granted" class="btn-primary">{{ t('base.analytics_allow', 'Permitir medición') }}</button>
+        <button type="button" data-consent-choice="denied" class="btn-secondary">{{ t('base.essential_only', 'Solo necesarias') }}</button>
       </div>
     </div>
   </aside>

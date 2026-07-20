@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="relative overflow-hidden">
+  <div class="aurora"></div>
+  <div class="pointer-events-none absolute inset-0 bg-grid-light opacity-40 [background-size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_90%)] dark:bg-grid-dark"></div>
+
+  <div class="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:grid-cols-12 lg:px-8 lg:pt-32">
+    <div class="lg:col-span-5">
+      <p class="eyebrow">{{ t('contact.eyebrow', 'Contacto') }}</p>
+      <h1 class="text-balance mt-6 font-display text-4xl font-semibold leading-[1.04] tracking-[-.05em] sm:text-6xl">
+        {{ t('contact.title', 'Cuéntanos qué quieres construir o mejorar.') }}
+      </h1>
+      <p class="text-pretty mt-6 text-base leading-7 text-slate-600 dark:text-slate-300">
+        {{ t('contact.description', 'Comparte el contexto, el reto actual y el resultado que necesitas. Tu mensaje llegará directamente al equipo de Gozsyl.') }}
+      </p>
+
+      <div class="mt-10 rounded-3xl border border-slate-200/80 bg-white/60 p-6 dark:border-white/[.08] dark:bg-white/[.025]">
+        <p class="font-display text-lg font-semibold">{{ t('contact.response_title', 'Qué sucede después') }}</p>
+        <ul class="mt-5 space-y-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span>{{ t('contact.response_1', 'Revisamos tu mensaje y el contexto del negocio.') }}</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-500"></span>{{ t('contact.response_2', 'Respondemos con preguntas útiles y un siguiente paso claro.') }}</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"></span>{{ t('contact.response_3', 'Usamos tus datos únicamente para responder esta solicitud.') }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7">
+      <div class="glass rounded-[2rem] p-6 sm:p-9">
+        {% if contact_sent %}
+          <div class="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6" role="status">
+            <h2 class="font-display text-2xl font-semibold text-emerald-600 dark:text-emerald-300">{{ t('contact.success_title', 'Mensaje enviado') }}</h2>
+            <p class="mt-3 leading-7 text-slate-600 dark:text-slate-300">{{ t('contact.success', 'Gracias. Tu mensaje llegó al equipo de Gozsyl.') }}</p>
+            <a href="{{ urls.home }}" class="btn-secondary mt-6">{{ t('error.back_home', 'Volver al inicio') }}</a>
+          </div>
+        {% else %}
+          {% if form_error %}
+            <div class="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-300" role="alert">
+              {{ form_error }}
+            </div>
+          {% endif %}
+
+          <p class="mb-6 text-sm text-slate-500 dark:text-slate-400">{{ t('contact.required_note', 'Los campos marcados con * son obligatorios.') }}</p>
+
+          <form action="{{ urls.contact }}" method="post" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
+              <label for="website">Website</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" value="" />
+            </div>
+
+            <div class="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="name" class="mb-2 block text-sm font-semibold">{{ t('contact.name', 'Nombre') }} *</label>
+                <input id="name" name="name" type="text" required minlength="2" maxlength="80" autocomplete="name"
+                       value="{{ form_values.get('name', '') }}"
+                       placeholder="{{ t('contact.name_placeholder', 'Tu nombre') }}"
+                       class="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 shadow-sm transition focus:border-brand-500 dark:border-white/10 dark:bg-ink-700 dark:text-white" />
+              </div>
+              <div>
+                <label for="email" class="mb-2 block text-sm font-semibold">{{ t('contact.email', 'Correo de trabajo') }} *</label>
+                <input id="email" name="email" type="email" required maxlength="254" autocomplete="email" inputmode="email"
+                       value="{{ form_values.get('email', '') }}"
+                       placeholder="{{ t('contact.email_placeholder', 'tu@empresa.com') }}"
+                       class="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 shadow-sm transition focus:border-brand-500 dark:border-white/10 dark:bg-ink-700 dark:text-white" />
+              </div>
+            </div>
+
+            <div>
+              <label for="company" class="mb-2 block text-sm font-semibold">{{ t('contact.company', 'Empresa (opcional)') }}</label>
+              <input id="company" name="company" type="text" maxlength="100" autocomplete="organization"
+                     value="{{ form_values.get('company', '') }}"
+                     placeholder="{{ t('contact.company_placeholder', 'Nombre de la empresa') }}"
+                     class="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-950 shadow-sm transition focus:border-brand-500 dark:border-white/10 dark:bg-ink-700 dark:text-white" />
+            </div>
+
+            <div>
+              <label for="message" class="mb-2 block text-sm font-semibold">{{ t('contact.message', '¿Qué quieres construir o mejorar?') }} *</label>
+              <textarea id="message" name="message" required minlength="20" maxlength="3000" rows="7"
+                        placeholder="{{ t('contact.message_placeholder', 'Cuéntanos el contexto, el problema actual y el resultado que necesitas.') }}"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-950 shadow-sm transition focus:border-brand-500 dark:border-white/10 dark:bg-ink-700 dark:text-white">{{ form_values.get('message', '') }}</textarea>
+            </div>
+
+            <label class="flex items-start gap-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+              <input name="consent" type="checkbox" value="accepted" required {% if form_values.get('consent') == 'accepted' %}checked{% endif %}
+                     class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600" />
+              <span>{{ t('contact.consent', 'Acepto que Gozsyl use estos datos únicamente para responder a mi solicitud.') }} *</span>
+            </label>
+
+            <button type="submit" class="btn-primary w-full sm:w-auto">{{ t('contact.submit', 'Enviar mensaje') }}</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

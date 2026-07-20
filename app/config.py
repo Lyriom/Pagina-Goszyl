@@ -9,7 +9,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,10 +32,18 @@ class Settings(BaseSettings):
         "Consultoría de producto digital, automatización e inteligencia artificial "
         "para empresas que quieren crecer con tecnología."
     )
-    CONTACT_EMAIL: str = "hola@gozsyl.com"
-    COMPANY_JURISDICTION: str = "Delaware, Estados Unidos"
     ENVIRONMENT: Literal["development", "staging", "production"] = "development"
     LOG_LEVEL: str = "INFO"
+
+    # --- Entrega de formularios ---
+    CONTACT_RECIPIENT_EMAIL: str = "jriera@gozsyl.cloud"
+    SMTP_HOST: str | None = None
+    SMTP_PORT: int = Field(default=587, ge=1, le=65_535)
+    SMTP_USERNAME: str | None = None
+    SMTP_PASSWORD: SecretStr | None = None
+    SMTP_FROM_EMAIL: str = "jriera@gozsyl.cloud"
+    SMTP_SECURITY: Literal["starttls", "ssl", "none"] = "starttls"
+    SMTP_TIMEOUT_SECONDS: int = Field(default=10, ge=1, le=60)
 
     # ----- Helpers -----
     @property
@@ -46,6 +54,11 @@ class Settings(BaseSettings):
     @classmethod
     def _canonicalize_app_name(cls, _value: object) -> str:
         return "Gozsyl"
+
+    @field_validator("CONTACT_RECIPIENT_EMAIL", mode="before")
+    @classmethod
+    def _canonicalize_contact_recipient(cls, _value: object) -> str:
+        return "jriera@gozsyl.cloud"
 
     @field_validator("APP_URL")
     @classmethod

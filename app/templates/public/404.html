@@ -6,14 +6,14 @@
   <div class="relative mx-auto max-w-2xl px-4 py-28 text-center sm:px-6 sm:py-36">
     <p class="font-display text-7xl font-semibold tracking-[-.06em] text-gradient sm:text-8xl">{{ error_code or 404 }}</p>
     <h1 class="text-balance mt-5 font-display text-3xl font-semibold tracking-[-.04em] sm:text-4xl">
-      {{ error_title or "Página no encontrada" }}
+      {{ error_title or t('error.not_found_title', 'Página no encontrada') }}
     </h1>
     <p class="mx-auto mt-4 max-w-lg leading-7 text-slate-600 dark:text-slate-400">
-      {{ error_message or "La página que buscas no existe, cambió de dirección o ya no está disponible." }}
+      {{ error_message or t('error.not_found_message', 'La página que buscas no existe, cambió de dirección o ya no está disponible.') }}
     </p>
     <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-      <a href="/" class="btn-primary">Volver al inicio</a>
-      <a href="mailto:{{ contact_email }}" class="btn-secondary">Contactar a Gozsyl</a>
+      <a href="{{ urls.home }}" class="btn-primary">{{ t('error.back_home', 'Volver al inicio') }}</a>
+      <a href="{{ urls.contact }}" class="btn-secondary">{{ t('error.contact', 'Contactar a Gozsyl') }}</a>
     </div>
   </div>
 </section>

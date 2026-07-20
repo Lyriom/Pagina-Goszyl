@@ -18,6 +18,7 @@ from loguru import logger
 from starlette.exceptions import HTTPException
 
 from app.config import settings
+from app.i18n import locale_from_path, localized_context, translate
 from app.logging_setup import configure_logging
 from app.routers import public
 from app.templating import templates
@@ -108,44 +109,65 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             headers=exc.headers,
         )
 
+    locale = locale_from_path(request.url.path)
+    context = localized_context(locale)
+    context.update(
+        {
+            "canonical_url": None,
+            "organization_description": translate(
+                locale,
+                "meta.organization_description",
+                settings.APP_DESCRIPTION,
+            ),
+            "error_code": exc.status_code,
+        }
+    )
+
     if exc.status_code == status.HTTP_404_NOT_FOUND:
-        return templates.TemplateResponse(
-            request,
-            "public/404.html",
-            {
-                "page_title": "Página no encontrada",
-                "error_code": 404,
-                "error_title": "Página no encontrada",
-                "error_message": (
-                    "La página que buscas no existe, cambió de dirección o ya no está disponible."
-                ),
-            },
-            status_code=404,
+        title = translate(
+            locale,
+            "error.not_found_title",
+            "Página no encontrada",
+        )
+        message = translate(
+            locale,
+            "error.not_found_message",
+            "La página que buscas no existe, cambió de dirección o ya no está disponible.",
+        )
+    elif exc.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN):
+        title = translate(
+            locale,
+            "error.restricted_title",
+            "Acceso restringido",
+        )
+        message = translate(
+            locale,
+            "error.restricted_message",
+            "No tienes permiso para ver esta página.",
+        )
+    else:
+        title = translate(
+            locale,
+            "error.generic_title",
+            "No pudimos completar la solicitud",
+        )
+        message = translate(
+            locale,
+            "error.generic_message",
+            "Inténtalo de nuevo o escríbenos si el problema continúa.",
         )
 
-    if exc.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN):
-        return templates.TemplateResponse(
-            request,
-            "public/404.html",  # reusamos la misma vista
-            {
-                "page_title": "Acceso restringido",
-                "error_code": exc.status_code,
-                "error_title": "Acceso restringido",
-                "error_message": (
-                    "No tienes permiso para ver esta página."
-                ),
-            },
-            status_code=exc.status_code,
-        )
-
+    context.update(
+        {
+            "page_title": title,
+            "page_description": message,
+            "error_title": title,
+            "error_message": message,
+        }
+    )
     return templates.TemplateResponse(
         request,
         "public/404.html",
-        {
-            "page_title": "No pudimos completar la solicitud",
-            "error_code": exc.status_code,
-            "error_title": "No pudimos completar la solicitud",
-            "error_message": "Inténtalo de nuevo o escríbenos si el problema continúa.",
-        },
+        context,
         status_code=exc.status_code,
     )

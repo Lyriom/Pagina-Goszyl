@@ -20,7 +20,4 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 # --- Globals ---
 templates.env.globals["app_name"] = settings.APP_NAME
 templates.env.globals["app_url"] = settings.APP_URL
-templates.env.globals["app_description"] = settings.APP_DESCRIPTION
-templates.env.globals["contact_email"] = settings.CONTACT_EMAIL
-templates.env.globals["company_jurisdiction"] = settings.COMPANY_JURISDICTION
 templates.env.globals["current_year"] = datetime.now().year
