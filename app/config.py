@@ -25,6 +25,8 @@ class Settings(BaseSettings):
 
     # --- Aplicación ---
     APP_URL: str = "http://localhost:8000"
+    # La marca no es configurable: evita que variables heredadas restauren
+    # accidentalmente una grafía incorrecta.
     APP_NAME: str = "Gozsyl"
     APP_DESCRIPTION: str = (
         "Consultoría de producto digital, automatización e inteligencia artificial "
@@ -43,6 +45,11 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT == "production"
+
+    @field_validator("APP_NAME", mode="before")
+    @classmethod
+    def _canonicalize_app_name(cls, _value: object) -> str:
+        return "Gozsyl"
 
     @field_validator("APP_URL")
     @classmethod
