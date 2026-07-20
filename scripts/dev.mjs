@@ -79,17 +79,12 @@ if (!existsSync(path.join(projectRoot, ".env"))) {
   const defaults = {
     APP_URL: `http://localhost:${port}`,
     ENVIRONMENT: "development",
-    DEV_PREVIEW_MODE: "true",
-    DATABASE_URL: "postgresql+asyncpg://gozsyl:gozsyl@127.0.0.1:5432/gozsyl",
   };
   for (const [key, value] of Object.entries(defaults)) {
     if (environment[key] === undefined) environment[key] = value;
   }
 }
 
-if (environment.DEV_PREVIEW_MODE === "true") {
-  console.log("Gozsyl: vista local sin conexión a la base de datos.\n");
-}
 console.log(`Gozsyl: http://localhost:${port}\n`);
 
 const childOptions = {

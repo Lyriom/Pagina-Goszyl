@@ -35,11 +35,7 @@ class Settings(BaseSettings):
     CONTACT_EMAIL: str = "hola@gozsyl.com"
     COMPANY_JURISDICTION: str = "Delaware, Estados Unidos"
     ENVIRONMENT: Literal["development", "staging", "production"] = "development"
-    DEV_PREVIEW_MODE: bool = False
     LOG_LEVEL: str = "INFO"
-
-    # --- Base de datos ---
-    DATABASE_URL: str
 
     # ----- Helpers -----
     @property

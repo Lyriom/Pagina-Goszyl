@@ -13,13 +13,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Dependencias de compilación para asyncpg / cryptography
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
-        libpq-dev \
-        curl \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /build
 
 # Crear venv aislada para copiarla luego al runtime
@@ -39,9 +32,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/opt/venv/bin:${PATH}" \
     PORT=8000
 
-# Solo libpq runtime (no compilador) para reducir superficie
+# curl se utiliza exclusivamente para el healthcheck.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        libpq5 \
         curl \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system app \

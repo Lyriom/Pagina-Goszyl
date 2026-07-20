@@ -11,7 +11,7 @@ from app.config import settings
 
 
 class _InterceptHandler(logging.Handler):
-    """Redirige logs del stdlib (uvicorn, sqlalchemy) hacia loguru."""
+    """Redirige los logs de Uvicorn hacia Loguru."""
 
     def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover
         try:
@@ -45,6 +45,6 @@ def configure_logging() -> None:
     )
 
     logging.basicConfig(handlers=[_InterceptHandler()], level=settings.LOG_LEVEL, force=True)
-    for noisy in ("uvicorn", "uvicorn.error", "uvicorn.access", "sqlalchemy.engine"):
+    for noisy in ("uvicorn", "uvicorn.error", "uvicorn.access"):
         logging.getLogger(noisy).handlers = [_InterceptHandler()]
         logging.getLogger(noisy).propagate = False

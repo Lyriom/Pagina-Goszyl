@@ -1,8 +1,8 @@
 # Gozsyl — web corporativa
 
 Sitio corporativo de Gozsyl construido con FastAPI, Jinja2 y Tailwind CSS.
-Incluye la página principal, información de la empresa, el caso destacado de
-Aurexir y un blog público de solo lectura.
+Incluye la página principal, información de la empresa y el caso destacado de
+Aurexir.
 
 ## Desarrollo local
 
@@ -25,9 +25,8 @@ El primer arranque:
 3. Instala las dependencias de `requirements.txt`.
 4. Inicia FastAPI y Tailwind CSS con recarga automática.
 
-La web queda disponible en http://localhost:8000. Si no existe `.env`, se
-activa una vista pública local que no consulta PostgreSQL. Así se puede revisar
-el diseño completo sin configurar servicios adicionales.
+La web queda disponible en http://localhost:8000 y puede revisarse sin
+configurar servicios adicionales.
 
 Para utilizar otro puerto:
 
@@ -37,7 +36,7 @@ PORT=8080 npm run dev
 
 ## Configuración
 
-Copia el archivo de ejemplo cuando quieras conectar el blog a PostgreSQL:
+Copia el archivo de ejemplo cuando quieras personalizar el entorno:
 
 ```bash
 cp .env.example .env
@@ -53,15 +52,7 @@ Variables disponibles:
 | `CONTACT_EMAIL` | Correo utilizado por las llamadas a la acción |
 | `COMPANY_JURISDICTION` | Jurisdicción mostrada en el sitio |
 | `ENVIRONMENT` | `development`, `staging` o `production` |
-| `DEV_PREVIEW_MODE` | Omite consultas del blog cuando es `true` |
-| `DATABASE_URL` | Conexión `postgresql+asyncpg://...` para el blog |
 | `LOG_LEVEL` | Nivel de registros de la aplicación |
-
-Después de configurar PostgreSQL aplica las migraciones:
-
-```bash
-.venv-dev/bin/alembic upgrade head
-```
 
 ## Comandos
 
@@ -76,9 +67,7 @@ npm run build:css  # genera la hoja CSS minificada
 |---|---|
 | `GET /` | Página principal |
 | `GET /acerca` | Información sobre Gozsyl |
-| `GET /blog` | Listado paginado de artículos |
-| `GET /blog/{slug}` | Detalle de un artículo publicado |
-| `GET /sitemap.xml` | Sitemap dinámico |
+| `GET /sitemap.xml` | Sitemap de páginas públicas |
 | `GET /robots.txt` | Directivas para buscadores |
 | `GET /healthz` | Estado básico de la aplicación |
 
@@ -87,8 +76,6 @@ npm run build:css  # genera la hoja CSS minificada
 - FastAPI y Uvicorn.
 - Jinja2 y JavaScript nativo.
 - Tailwind CSS precompilado.
-- SQLAlchemy async, Alembic y PostgreSQL para el blog.
-- Markdown y Bleach para renderizado seguro de artículos.
 
 ## Producción
 
@@ -102,4 +89,4 @@ docker build -t gozsyl-web:latest .
 ```
 
 Configura las variables de `.env.example` en la plataforma de despliegue y
-ejecuta `alembic upgrade head` cuando utilices el blog conectado a PostgreSQL.
+despliega la imagen generada.

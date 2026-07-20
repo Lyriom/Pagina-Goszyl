@@ -46,9 +46,5 @@ logs/
 # --- Uploads en local ---
 app/static/uploads/
 
-# --- Alembic (mantener migraciones, ignorar cache) ---
-alembic/__pycache__/
-alembic/versions/__pycache__/
-
 # --- Docker ---
 docker-compose.override.yml
