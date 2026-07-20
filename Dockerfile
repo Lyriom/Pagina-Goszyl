@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.7
 # =====================================================================
-# Sistema A - Dockerfile multi-stage para produccion
+# Gozsyl - Dockerfile multi-stage para producción
 # Stage 1 (builder): instala dependencias en una venv aislada.
-# Stage 2 (runtime): imagen final minima, sin toolchain de compilacion.
+# Stage 2 (runtime): imagen final mínima, sin toolchain de compilación.
 # =====================================================================
 
 # ---------- Stage 1: builder ----------
@@ -13,7 +13,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Dependencias de compilacion para asyncpg / cryptography
+# Dependencias de compilación para asyncpg / cryptography
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         libpq-dev \
@@ -52,14 +52,17 @@ WORKDIR /app
 # Copiar la venv ya construida
 COPY --from=builder /opt/venv /opt/venv
 
-# Copiar el codigo
+# Copiar el código
 COPY --chown=app:app . /app
 
 USER app
 
 EXPOSE 8000
 
-# Gunicorn + UvicornWorker para produccion
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl --fail --silent http://127.0.0.1:8000/healthz || exit 1
+
+# Gunicorn + UvicornWorker para producción
 CMD ["gunicorn", "app.main:app", \
      "--workers", "3", \
      "--worker-class", "uvicorn.workers.UvicornWorker", \

@@ -1,16 +1,18 @@
-"""Conexion async a PostgreSQL via SQLAlchemy 2.0.
+"""Conexión async a PostgreSQL vía SQLAlchemy 2.0.
 
 Expone:
 - `engine`: AsyncEngine compartido del proceso.
 - `AsyncSessionLocal`: factory de sesiones.
 - `Base`: clase base declarativa para los modelos.
-- `get_session`: dependencia FastAPI que cede una sesion por request.
+- `get_session`: dependencia FastAPI que cede una sesión por solicitud.
 """
 
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
+from typing import Annotated
 
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -23,7 +25,7 @@ from app.config import settings
 
 
 class Base(DeclarativeBase):
-    """Clase base para todos los modelos ORM del Sistema A."""
+    """Clase base para los modelos ORM del blog."""
 
 
 engine: AsyncEngine = create_async_engine(
@@ -43,10 +45,13 @@ AsyncSessionLocal: async_sessionmaker[AsyncSession] = async_sessionmaker(
 
 
 async def get_session() -> AsyncIterator[AsyncSession]:
-    """Cede una sesion async; hace commit al salir si no hubo excepciones."""
+    """Cede una sesión asíncrona; hace commit al salir si no hubo excepciones."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
         except Exception:
             await session.rollback()
             raise
+
+
+DBSession = Annotated[AsyncSession, Depends(get_session)]

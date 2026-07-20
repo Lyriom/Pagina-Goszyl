@@ -1,4 +1,4 @@
-"""Configuracion de logging unificada (loguru)."""
+"""Configuración unificada de registros (loguru)."""
 
 from __future__ import annotations
 

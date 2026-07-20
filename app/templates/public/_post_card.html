@@ -1,49 +1,48 @@
-<article class="group relative rounded-2xl overflow-hidden glass card-hover">
+<article class="glass card-hover group relative flex h-full flex-col overflow-hidden rounded-3xl">
   {% if post.cover_image_url %}
-    <a href="/blog/{{ post.slug }}" class="block aspect-[16/9] overflow-hidden bg-slate-100 dark:bg-ink-700">
-      <img src="{{ post.cover_image_url }}" alt="{{ post.title }}" loading="lazy"
-           class="w-full h-full object-cover group-hover:scale-[1.04] transition duration-500" />
+    <a href="/blog/{{ post.slug }}" class="block aspect-[16/9] overflow-hidden bg-slate-100 dark:bg-ink-700" tabindex="-1" aria-hidden="true">
+      <img src="{{ post.cover_image_url }}" alt="" loading="lazy" decoding="async"
+           class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]" />
     </a>
   {% else %}
-    <a href="/blog/{{ post.slug }}" class="block aspect-[16/9] relative overflow-hidden
-              bg-gradient-to-br from-brand-600/30 via-fuchsia-600/20 to-cyan-500/30">
-      <div class="absolute inset-0 bg-grid-dark [background-size:24px_24px] opacity-30"></div>
-      <div class="absolute inset-0 grid place-items-center">
-        <span class="font-display font-semibold text-3xl text-white/80 px-6 text-center line-clamp-2">
-          {{ post.title }}
-        </span>
+    <a href="/blog/{{ post.slug }}" class="relative block aspect-[16/9] overflow-hidden bg-slate-950" tabindex="-1" aria-hidden="true">
+      <div class="absolute inset-0 bg-grid-dark opacity-30 [background-size:26px_26px]"></div>
+      <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand-500/35 blur-3xl"></div>
+      <div class="absolute bottom-5 left-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-white/60">
+        <span class="h-2 w-2 rounded-full bg-signal"></span>
+        {{ app_name }} · Ideas
       </div>
     </a>
   {% endif %}
-  <div class="p-5">
-    <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-      <span class="inline-flex items-center gap-1">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M3 11h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/>
-        </svg>
+
+  <div class="flex flex-1 flex-col p-6">
+    <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+      <time datetime="{{ (post.published_at or post.created_at).date().isoformat() }}">
         {{ (post.published_at or post.created_at) | format_date }}
-      </span>
+      </time>
       {% if post.author %}
-        <span class="opacity-50">&middot;</span>
+        <span aria-hidden="true">·</span>
         <span>{{ post.author.full_name or post.author.username }}</span>
       {% endif %}
-    </p>
-    <h3 class="mt-2 font-display text-lg font-semibold leading-snug">
-      <a href="/blog/{{ post.slug }}"
-         class="text-slate-900 dark:text-white hover:text-brand-500 dark:hover:text-brand-300 transition">
+    </div>
+
+    <h3 class="mt-3 font-display text-xl font-semibold leading-snug tracking-[-.02em]">
+      <a href="/blog/{{ post.slug }}" class="transition hover:text-brand-600 dark:hover:text-brand-300">
         {{ post.title }}
       </a>
     </h3>
+
     {% if post.excerpt %}
-      <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+      <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
         {{ post.excerpt }}
       </p>
     {% endif %}
-    <div class="mt-4 inline-flex items-center gap-1 text-xs font-medium text-brand-500 dark:text-brand-300">
-      Leer articulo
-      <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+
+    <a href="/blog/{{ post.slug }}" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200">
+      Leer artículo
+      <svg class="h-4 w-4 transition group-hover:translate-x-1" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5"/>
       </svg>
-    </div>
+    </a>
   </div>
 </article>

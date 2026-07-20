@@ -1,4 +1,4 @@
-"""Modelo Post - articulos del blog corporativo."""
+"""Modelo Post: artículos del blog corporativo."""
 
 from __future__ import annotations
 
@@ -7,26 +7,25 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.models.sync_log import FeaturedSyncLog
     from app.models.user import User
 
 
 class PostStatus(StrEnum):
-    """Estados de un articulo."""
+    """Estados de un artículo."""
 
     DRAFT = "draft"
     PUBLISHED = "published"
 
 
 class Post(Base):
-    """Articulo de blog. El contenido se almacena en Markdown."""
+    """Artículo de blog. El contenido se almacena en Markdown."""
 
     __tablename__ = "posts"
 
@@ -52,10 +51,6 @@ class Post(Base):
     status: Mapped[str] = mapped_column(
         String(20), nullable=False, default=PostStatus.DRAFT.value, index=True
     )
-    is_featured: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, index=True
-    )
-
     published_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True, index=True
     )
@@ -72,13 +67,6 @@ class Post(Base):
     author: Mapped["User"] = relationship(
         "User", back_populates="posts", lazy="joined"
     )
-    sync_logs: Mapped[list["FeaturedSyncLog"]] = relationship(
-        "FeaturedSyncLog",
-        back_populates="post",
-        cascade="all, delete-orphan",
-        lazy="selectin",
-    )
-
     @property
     def is_published(self) -> bool:
         return self.status == PostStatus.PUBLISHED.value

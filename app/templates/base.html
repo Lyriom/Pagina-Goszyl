@@ -3,411 +3,547 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="format-detection" content="telephone=no" />
   <title>{{ page_title or app_name }}</title>
 
-  {# --- SEO basico --- #}
+  {# Metadatos y SEO #}
   <meta name="description" content="{{ page_description or app_description }}" />
+  <meta name="author" content="{{ app_name }}" />
+  <meta name="robots" content="{{ 'noindex,nofollow' if request.url.path == '/_404' or (error_code | default(false)) else 'index,follow' }}" />
   <link rel="canonical" href="{{ canonical_url or (app_url + request.url.path) }}" />
-  <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#080b12" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)" />
 
-  {# --- Open Graph / Twitter --- #}
-  <meta property="og:type" content="website" />
+  {# Open Graph / X #}
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:type" content="{{ og_type or 'website' }}" />
+  <meta property="og:site_name" content="{{ app_name }}" />
   <meta property="og:title" content="{{ page_title or app_name }}" />
   <meta property="og:description" content="{{ page_description or app_description }}" />
   <meta property="og:url" content="{{ canonical_url or (app_url + request.url.path) }}" />
-  {% if og_image %}<meta property="og:image" content="{{ og_image }}" />{% endif %}
+  <meta property="og:image" content="{{ og_image or (app_url + '/static/images/gozsyl-og.png') }}" />
+  <meta property="og:image:alt" content="{{ app_name }} — producto digital, IA y automatización" />
   <meta name="twitter:card" content="summary_large_image" />
 
-  {# --- Tema: pre-paint y toggle global (vanilla, no depende de Alpine) --- #}
+  {# Datos estructurados de la empresa #}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": {{ app_name | tojson }},
+    "url": {{ app_url | tojson }},
+    "email": {{ contact_email | tojson }},
+    "description": {{ app_description | tojson }}
+  }
+  </script>
+
+  {# Tema antes del primer render para evitar parpadeos #}
   <script>
     (function () {
       var root = document.documentElement;
-      function getStoredTheme() {
-        try { return localStorage.getItem('theme'); } catch (e) { return null; }
+      function storedTheme() {
+        try { return localStorage.getItem('theme'); } catch (error) { return null; }
       }
-      function applyTheme(t) {
-        if (t !== 'light' && t !== 'dark') t = 'dark';
-        root.classList.toggle('dark',  t === 'dark');
-        root.classList.toggle('light', t === 'light');
-        try { localStorage.setItem('theme', t); } catch (e) {}
-        try { window.dispatchEvent(new CustomEvent('theme-changed', { detail: t })); } catch (e) {}
+      function systemTheme() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+          ? 'light'
+          : 'dark';
+      }
+      function applyTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') theme = systemTheme();
+        root.classList.toggle('dark', theme === 'dark');
+        root.classList.toggle('light', theme === 'light');
+        root.dataset.theme = theme;
+        try { localStorage.setItem('theme', theme); } catch (error) {}
+        try {
+          window.dispatchEvent(new CustomEvent('theme-changed', { detail: theme }));
+        } catch (error) {}
       }
       window.__applyTheme = applyTheme;
       window.__toggleTheme = function () {
-        var current = root.classList.contains('dark') ? 'dark' : 'light';
-        applyTheme(current === 'dark' ? 'light' : 'dark');
+        applyTheme(root.classList.contains('dark') ? 'light' : 'dark');
       };
-      // Pre-paint
-      applyTheme(getStoredTheme() || 'dark');
+      applyTheme(storedTheme() || systemTheme());
     })();
   </script>
 
-  {# --- Tailwind via CDN (sin build step) --- #}
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            display: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif']
-          },
-          colors: {
-            brand: {
-              50:  '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81'
-            },
-            ink: {
-              900: '#06060a',
-              850: '#0a0a0f',
-              800: '#0e0e15',
-              700: '#13131c',
-              600: '#1a1a26',
-              500: '#22222f'
-            }
-          },
-          boxShadow: {
-            glow: '0 0 60px -10px rgba(99, 102, 241, 0.45)',
-            soft: '0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px -8px rgba(0,0,0,0.4)'
-          },
-          backgroundImage: {
-            'grid-dark': "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-            'grid-light': "linear-gradient(rgba(0,0,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px)"
-          },
-          keyframes: {
-            float: {
-              '0%,100%': { transform: 'translateY(0px)' },
-              '50%':     { transform: 'translateY(-12px)' }
-            },
-            shine: {
-              '0%':   { backgroundPosition: '0% 50%' },
-              '100%': { backgroundPosition: '200% 50%' }
-            }
-          },
-          animation: {
-            float: 'float 7s ease-in-out infinite',
-            shine: 'shine 6s linear infinite'
-          }
-        }
-      }
-    };
-  </script>
-
-  {# --- Fuentes --- #}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-
-  {# --- HTMX + Alpine.js --- #}
-  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
-  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <link href="/static/css/site.css" rel="stylesheet" />
 
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: 'Inter', system-ui, sans-serif; }
+    :root {
+      color-scheme: light;
+      --page: #f7f8fb;
+      --surface: rgba(255, 255, 255, 0.8);
+      --surface-solid: #ffffff;
+      --line: rgba(15, 23, 42, 0.11);
+      --muted: #5f6b7c;
+    }
+    .dark {
+      color-scheme: dark;
+      --page: #080b12;
+      --surface: rgba(18, 24, 39, 0.7);
+      --surface-solid: #0d111b;
+      --line: rgba(255, 255, 255, 0.09);
+      --muted: #9aa6b8;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--page); }
+    body {
+      margin: 0;
+      background: var(--page);
+      font-family: 'Inter', system-ui, sans-serif;
+      text-rendering: optimizeLegibility;
+    }
+    ::selection { background: rgba(101, 88, 245, 0.28); }
+    [hidden] { display: none !important; }
+    .text-balance { text-wrap: balance; }
+    .text-pretty { text-wrap: pretty; }
 
-    /* Texto con gradiente (default = light, mas saturado en dark) */
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 0.75rem;
+      left: 0.75rem;
+      transform: translateY(-160%);
+      border-radius: 0.75rem;
+      background: #ffffff;
+      color: #080b12;
+      padding: 0.7rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      box-shadow: 0 12px 32px rgba(0,0,0,.24);
+      transition: transform .2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    a, button, input, textarea, select { outline-offset: 3px; }
+    :focus-visible { outline: 2px solid #8578ff; }
+
+    .brand-mark {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 2.35rem;
+      height: 2.35rem;
+      overflow: hidden;
+      border-radius: 0.8rem;
+      background: #6558f5;
+      color: #ffffff;
+      box-shadow: 0 12px 30px -16px rgba(101, 88, 245, .9);
+    }
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      width: 1.25rem;
+      height: 1.25rem;
+      right: -0.45rem;
+      bottom: -0.45rem;
+      border-radius: 999px;
+      background: #baf56a;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      color: #5748db;
+    }
+    .dark .eyebrow { color: #aaa1ff; }
+    .eyebrow::before {
+      content: "";
+      width: 1.75rem;
+      height: 1px;
+      background: currentColor;
+    }
+
     .text-gradient {
-      background: linear-gradient(90deg, #4f46e5 0%, #a855f7 35%, #06b6d4 70%, #4f46e5 100%);
-      background-size: 200% 100%;
+      background: linear-gradient(105deg, #5748db 0%, #6558f5 42%, #0ea5c9 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: shine 8s linear infinite;
     }
     .dark .text-gradient {
-      background: linear-gradient(90deg, #818cf8 0%, #c084fc 35%, #22d3ee 70%, #818cf8 100%);
-      background-size: 200% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      animation: shine 8s linear infinite;
+      background-image: linear-gradient(105deg, #cbc6ff 0%, #8578ff 48%, #67e8f9 100%);
     }
 
-    /* Aurora / orbes de fondo (default = light, sobreescrito en .dark) */
     .aurora {
       position: absolute;
       inset: 0;
+      z-index: 0;
       overflow: hidden;
       pointer-events: none;
-      z-index: 0;
     }
     .aurora::before,
     .aurora::after {
       content: "";
       position: absolute;
-      width: 60vmax;
-      height: 60vmax;
-      border-radius: 50%;
+      border-radius: 999px;
       filter: blur(110px);
-      will-change: transform;
     }
     .aurora::before {
-      top: -25%;
-      left: -15%;
-      background: radial-gradient(circle at 30% 30%, #6366f1 0%, transparent 60%);
-      animation: float 9s ease-in-out infinite;
-      opacity: 0.18;
+      width: 38rem;
+      height: 38rem;
+      top: -18rem;
+      left: -13rem;
+      background: rgba(101, 88, 245, .22);
     }
     .aurora::after {
-      bottom: -30%;
-      right: -20%;
-      background: radial-gradient(circle at 70% 70%, #22d3ee 0%, transparent 60%);
-      animation: float 11s ease-in-out infinite reverse;
-      opacity: 0.16;
+      width: 30rem;
+      height: 30rem;
+      right: -14rem;
+      bottom: -18rem;
+      background: rgba(14, 165, 201, .14);
     }
-    .dark .aurora::before { opacity: 0.55; }
-    .dark .aurora::after  { opacity: 0.50; }
+    .dark .aurora::before { background: rgba(101, 88, 245, .3); }
+    .dark .aurora::after { background: rgba(14, 165, 201, .2); }
 
-    /* Tarjetas glass (default = light) */
     .glass {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid rgba(15,23,42,0.08);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -16px rgba(15,23,42,0.12);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 24px 60px -44px rgba(2, 6, 23, .55);
     }
-    .dark .glass {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px -8px rgba(0,0,0,0.4);
-    }
-
-    /* Borde con gradiente al hover */
     .card-hover {
-      position: relative;
-      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
-    .card-hover:hover {
-      transform: translateY(-3px);
-      border-color: rgba(99, 102, 241, 0.5);
-      box-shadow: 0 12px 32px -12px rgba(99, 102, 241, 0.35), 0 4px 12px -4px rgba(15,23,42,0.08);
-    }
-    .dark .card-hover:hover {
-      border-color: rgba(129, 140, 248, 0.45);
-      box-shadow: 0 0 40px -12px rgba(99, 102, 241, 0.45);
+    @media (hover: hover) {
+      .card-hover:hover {
+        transform: translateY(-4px);
+        border-color: rgba(101, 88, 245, .42);
+        box-shadow: 0 28px 70px -42px rgba(87, 72, 219, .55);
+      }
     }
 
-    /* Boton primario brillante */
+    .btn-primary,
+    .btn-secondary,
+    .btn-accent {
+      display: inline-flex;
+      min-height: 2.8rem;
+      align-items: center;
+      justify-content: center;
+      gap: .55rem;
+      border-radius: .8rem;
+      padding: .72rem 1.15rem;
+      font-size: .9rem;
+      font-weight: 700;
+      transition: transform .2s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
     .btn-primary {
-      background-image: linear-gradient(120deg, #6366f1, #8b5cf6, #22d3ee, #6366f1);
-      background-size: 200% 100%;
-      animation: shine 7s linear infinite;
-      color: white;
-      box-shadow: 0 8px 24px -8px rgba(99,102,241,0.6);
+      border: 1px solid #6558f5;
+      background: #6558f5;
+      color: #ffffff;
+      box-shadow: 0 16px 34px -18px rgba(101, 88, 245, .95);
     }
-    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-primary:hover { background: #5748db; transform: translateY(-2px); }
+    .btn-secondary {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: inherit;
+    }
+    .btn-secondary:hover { border-color: rgba(101, 88, 245, .5); transform: translateY(-2px); }
+    .btn-accent {
+      border: 1px solid #baf56a;
+      background: #baf56a;
+      color: #11180a;
+      box-shadow: 0 16px 36px -18px rgba(186, 245, 106, .65);
+    }
+    .btn-accent:hover { background: #c8ff7b; transform: translateY(-2px); }
 
-    /* Prose (default = light) */
-    .prose-content h1, .prose-content h2, .prose-content h3 { font-weight: 600; margin-top: 1.5em; margin-bottom: 0.6em; letter-spacing: -0.01em; }
-    .prose-content h1 { font-size: 1.875rem; }
-    .prose-content h2 { font-size: 1.5rem; }
+    .prose-content h1,
+    .prose-content h2,
+    .prose-content h3 {
+      margin-top: 1.6em;
+      margin-bottom: .65em;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-weight: 600;
+      letter-spacing: -.02em;
+    }
+    .prose-content h1 { font-size: 2rem; }
+    .prose-content h2 { font-size: 1.55rem; }
     .prose-content h3 { font-size: 1.25rem; }
-    .prose-content p  { margin: 1em 0; line-height: 1.8; }
-    .prose-content a  { color: #4f46e5; text-decoration: underline; text-underline-offset: 3px; }
-    .prose-content ul, .prose-content ol { margin: 1em 0 1em 1.5em; }
-    .prose-content code { background: #f1f5f9; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
-    .prose-content pre  { background: #0f172a; color: #f1f5f9; padding: 1rem; border-radius: 10px; overflow-x: auto; }
+    .prose-content p { margin: 1em 0; line-height: 1.8; }
+    .prose-content a { color: #5748db; text-decoration: underline; text-underline-offset: 3px; }
+    .prose-content ul,
+    .prose-content ol { margin: 1em 0 1em 1.5em; }
+    .prose-content li { margin: .35em 0; }
+    .prose-content code { border-radius: .35rem; background: rgba(100,116,139,.13); padding: .15em .4em; font-size: .9em; }
+    .prose-content pre { overflow-x: auto; border: 1px solid var(--line); border-radius: 1rem; background: #070a10; color: #e2e8f0; padding: 1rem; }
     .prose-content pre code { background: transparent; color: inherit; padding: 0; }
-    .prose-content img { max-width: 100%; border-radius: 10px; margin: 1.5em 0; }
-    .prose-content blockquote { border-left: 3px solid #6366f1; padding-left: 1rem; color: #475569; font-style: italic; margin: 1.25em 0; }
+    .prose-content img { max-width: 100%; margin: 1.5em 0; border-radius: 1rem; }
+    .prose-content blockquote { margin: 1.4em 0; border-left: 3px solid #6558f5; padding-left: 1rem; color: var(--muted); font-style: italic; }
+    .dark .prose-content a { color: #aaa1ff; }
 
-    .dark .prose-content a { color: #a5b4fc; }
-    .dark .prose-content code { background: rgba(255,255,255,0.06); }
-    .dark .prose-content pre { background: #06060a; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.06); }
-    .dark .prose-content blockquote { color: #cbd5e1; }
-
-    /* Iconos del toggle de tema (CSS-only, no depende de Alpine) */
     .icon-sun, .icon-moon { display: none; }
-    .dark  .icon-sun  { display: inline-block; }
+    .dark .icon-sun { display: inline-block; }
     .light .icon-moon { display: inline-block; }
-    /* Fallback si por alguna razon no hay clase .light ni .dark */
     html:not(.dark):not(.light) .icon-sun { display: inline-block; }
 
-    /* Scrollbar (default = light) */
     ::-webkit-scrollbar { width: 10px; height: 10px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.15); border-radius: 999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(15,23,42,0.25); }
-    .dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
-    .dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+    ::-webkit-scrollbar-thumb { border: 3px solid transparent; border-radius: 999px; background: rgba(100,116,139,.35); background-clip: padding-box; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto !important; }
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
   </style>
-
-  {# --- Google Tag Manager --- #}
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-PC7VW4JT');</script>
-
-  {# --- Google AdSense --- #}
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8131314409814376"
-       crossorigin="anonymous"></script>
 
   {% block head_extra %}{% endblock %}
 </head>
-<body class="h-full antialiased flex flex-col min-h-screen
-             bg-white text-slate-900
-             dark:bg-ink-850 dark:text-slate-100
-             transition-colors duration-300">
+<body class="flex min-h-screen flex-col bg-[#f7f8fb] text-slate-950 antialiased transition-colors duration-300 dark:bg-ink-850 dark:text-slate-100">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-  {# --- Google Tag Manager (noscript) --- #}
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PC7VW4JT"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-
-  {# --- Header --- #}
-  <header class="sticky top-0 z-40 backdrop-blur-xl
-                 bg-white/70 dark:bg-ink-850/70
-                 border-b border-slate-200/70 dark:border-white/5">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-2 group">
-        <span class="relative inline-flex w-8 h-8 rounded-lg
-                     bg-gradient-to-br from-brand-500 via-fuchsia-500 to-cyan-400
-                     shadow-glow group-hover:scale-105 transition">
-          <span class="absolute inset-[2px] rounded-md bg-white dark:bg-ink-850 grid place-items-center font-display font-bold text-sm text-slate-900 dark:text-white">
-            {{ (app_name[:1] | upper) if app_name else 'G' }}
-          </span>
+  <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-[#f7f8fb]/85 backdrop-blur-xl dark:border-white/[.07] dark:bg-ink-850/85">
+    <div class="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <a href="/" class="group flex items-center gap-3" aria-label="{{ app_name }}, ir al inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="relative z-10 font-display text-sm font-bold">G</span>
         </span>
-        <span class="font-display font-semibold tracking-tight text-base">{{ app_name }}</span>
+        <span class="leading-none">
+          <span class="block font-display text-[1.05rem] font-semibold tracking-[-.03em]">{{ app_name }}</span>
+          <span class="mt-1 hidden text-[.61rem] font-semibold uppercase tracking-[.16em] text-slate-500 dark:text-slate-500 sm:block">Sistemas digitales</span>
+        </span>
       </a>
 
-      <nav class="hidden md:flex items-center gap-1 text-sm">
-        <a href="/" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Inicio</a>
-        <a href="/#servicios" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Servicios</a>
-        <a href="/acerca" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Acerca</a>
-        <a href="/blog" class="px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Blog</a>
-
-        {# --- Toggle tema --- #}
-        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema"
-                class="ml-2 p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition">
-          <svg class="icon-sun w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
-          </svg>
-          <svg class="icon-moon w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
-          </svg>
-        </button>
-
-        {% if user %}
-          <a href="/admin" class="ml-2 px-3 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition">Admin</a>
-          <a href="/auth/logout" class="px-3 py-2 rounded-md text-slate-500 hover:text-slate-900 dark:hover:text-white transition">Salir</a>
-        {% else %}
-          <a href="/auth/login"
-             class="ml-2 btn-primary px-4 py-2 rounded-md text-sm font-medium">
-            Acceder
-          </a>
-        {% endif %}
+      <nav class="hidden items-center gap-1 text-sm lg:flex" aria-label="Navegación principal">
+        <a href="/#servicios" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Servicios</a>
+        <a href="/#proyectos" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Proyecto destacado</a>
+        <a href="/#proceso" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Proceso</a>
+        <a href="/acerca" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Nosotros</a>
+        <a href="/blog" class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-900/[.04] hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/[.06] dark:hover:text-white">Ideas</a>
       </nav>
 
-      {# --- Mobile menu --- #}
-      <div class="md:hidden flex items-center gap-1" x-data="{ open: false }">
-        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema"
-                class="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition">
-          <svg class="icon-sun w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+      <div class="hidden items-center gap-2 lg:flex">
+        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema de color"
+                class="grid min-h-11 min-w-11 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-900/[.05] dark:text-slate-300 dark:hover:bg-white/[.06]">
+          <svg class="icon-sun h-5 w-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
           </svg>
-          <svg class="icon-moon w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+          <svg class="icon-moon h-5 w-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
           </svg>
         </button>
-        <button @click="open = !open" class="p-2 -mr-1" aria-label="Menu">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        <a href="mailto:{{ contact_email }}?subject=Nuevo%20proyecto%20para%20Gozsyl" class="btn-primary">
+          Hablemos
+          <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-1 lg:hidden" data-mobile-nav>
+        <button onclick="window.__toggleTheme()" type="button" aria-label="Cambiar tema de color"
+                class="grid min-h-11 min-w-11 place-items-center rounded-xl text-slate-600 dark:text-slate-300">
+          <svg class="icon-sun h-5 w-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M18.72 18.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M18.72 5.28l1.06-1.06M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+          </svg>
+          <svg class="icon-moon h-5 w-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
           </svg>
         </button>
-        <div x-show="open" x-transition @click.outside="open = false"
-             class="absolute right-4 top-14 w-60 rounded-xl p-2 text-sm shadow-soft
-                    bg-white dark:bg-ink-800
-                    border border-slate-200 dark:border-white/10">
-          <a href="/" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Inicio</a>
-          <a href="/#servicios" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Servicios</a>
-          <a href="/acerca" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Acerca</a>
-          <a href="/blog" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Blog</a>
-          {% if user %}
-            <a href="/admin" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Admin</a>
-            <a href="/auth/logout" class="block px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-white/5">Salir</a>
-          {% else %}
-            <a href="/auth/login" class="block px-3 py-2 rounded mt-1 btn-primary text-center font-medium">Acceder</a>
-          {% endif %}
+        <button type="button" class="grid min-h-11 min-w-11 place-items-center rounded-xl"
+                aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir o cerrar el menú" data-menu-toggle>
+          <svg class="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-menu-open-icon>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+          <svg hidden class="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-menu-close-icon>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m6 6 12 12M18 6 6 18"/>
+          </svg>
+        </button>
+        <div id="menu-movil" hidden
+             class="absolute left-4 right-4 top-[4.15rem] rounded-2xl border border-slate-200 bg-white p-2 text-sm shadow-2xl dark:border-white/10 dark:bg-ink-700">
+          <a href="/#servicios" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Servicios</a>
+          <a href="/#proyectos" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Proyecto destacado</a>
+          <a href="/#proceso" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Proceso</a>
+          <a href="/acerca" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Nosotros</a>
+          <a href="/blog" class="block rounded-xl px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/[.06]">Ideas</a>
+          <a href="mailto:{{ contact_email }}?subject=Nuevo%20proyecto%20para%20Gozsyl" class="btn-primary mt-2 w-full">Cuéntanos tu proyecto</a>
         </div>
       </div>
     </div>
   </header>
 
-  {# --- Toast container (HTMX/Alpine) --- #}
-  <div id="toast-region"
-       x-data="{ msgs: [] }"
-       @toast.window="msgs.push($event.detail); setTimeout(() => msgs.shift(), 4000)"
-       class="fixed top-20 right-4 z-50 space-y-2">
-    <template x-for="(m, i) in msgs" :key="i">
-      <div class="px-4 py-2 rounded-md shadow-lg text-sm
-                  bg-slate-900 text-white dark:bg-white dark:text-slate-900" x-text="m"></div>
-    </template>
-  </div>
+  <div id="toast-region" class="fixed right-4 top-24 z-50 space-y-2" aria-live="polite" aria-atomic="true"></div>
 
-  {# --- Main --- #}
-  <main class="flex-1 relative">
+  <main id="contenido" class="relative flex-1" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
 
-  {# --- Footer --- #}
-  <footer class="mt-24 border-t border-slate-200 dark:border-white/5 relative overflow-hidden">
-    <div class="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent"></div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-14 grid gap-10 md:grid-cols-4 text-sm
-                text-slate-600 dark:text-slate-400">
-      <div class="md:col-span-2">
-        <div class="flex items-center gap-2">
-          <span class="relative inline-flex w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 via-fuchsia-500 to-cyan-400">
-            <span class="absolute inset-[2px] rounded-md bg-white dark:bg-ink-850 grid place-items-center font-display font-bold text-sm text-slate-900 dark:text-white">
-              {{ (app_name[:1] | upper) if app_name else 'G' }}
-            </span>
-          </span>
-          <p class="font-display font-semibold text-base text-slate-900 dark:text-white">{{ app_name }}</p>
-        </div>
-        <p class="mt-3 max-w-sm">
-          Consultora especializada en automatizacion, landing pages, chatbots y analisis de datos.
-          Convertimos procesos manuales en sistemas que escalan.
+  <footer class="relative mt-20 overflow-hidden border-t border-slate-200/80 bg-white/60 dark:border-white/[.07] dark:bg-ink-900/35">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/60 to-transparent"></div>
+    <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-12 lg:px-8">
+      <div class="md:col-span-6">
+        <a href="/" class="inline-flex items-center gap-3" aria-label="{{ app_name }}, ir al inicio">
+          <span class="brand-mark" aria-hidden="true"><span class="relative z-10 font-display text-sm font-bold">G</span></span>
+          <span class="font-display text-lg font-semibold">{{ app_name }}</span>
+        </a>
+        <p class="mt-4 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-400">
+          Diseñamos productos digitales, automatizaciones y sistemas de datos que convierten ideas y procesos complejos en herramientas claras y útiles.
+        </p>
+        <p class="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.12em] text-slate-500">
+          <span class="h-1.5 w-1.5 rounded-full bg-signal"></span>
+          Empresa constituida en {{ company_jurisdiction }}
         </p>
       </div>
-      <div>
-        <p class="font-medium text-slate-900 dark:text-white">Navegacion</p>
-        <ul class="mt-3 space-y-1.5">
-          <li><a href="/" class="hover:text-slate-900 dark:hover:text-white transition">Inicio</a></li>
-          <li><a href="/#servicios" class="hover:text-slate-900 dark:hover:text-white transition">Servicios</a></li>
-          <li><a href="/acerca" class="hover:text-slate-900 dark:hover:text-white transition">Acerca</a></li>
-          <li><a href="/blog" class="hover:text-slate-900 dark:hover:text-white transition">Blog</a></li>
+
+      <div class="md:col-span-3">
+        <p class="text-sm font-semibold text-slate-950 dark:text-white">Explora</p>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
+          <li><a href="/#servicios" class="transition hover:text-brand-600 dark:hover:text-brand-300">Servicios</a></li>
+          <li><a href="/#proyectos" class="transition hover:text-brand-600 dark:hover:text-brand-300">Proyecto destacado</a></li>
+          <li><a href="/#proceso" class="transition hover:text-brand-600 dark:hover:text-brand-300">Proceso</a></li>
+          <li><a href="/acerca" class="transition hover:text-brand-600 dark:hover:text-brand-300">Nosotros</a></li>
+          <li><a href="/blog" class="transition hover:text-brand-600 dark:hover:text-brand-300">Ideas</a></li>
         </ul>
       </div>
-      <div>
-        <p class="font-medium text-slate-900 dark:text-white">Conecta</p>
-        <ul class="mt-3 space-y-1.5">
-          <li><a href="#" class="hover:text-slate-900 dark:hover:text-white transition">LinkedIn</a></li>
-          <li><a href="#" class="hover:text-slate-900 dark:hover:text-white transition">GitHub</a></li>
-          <li><a href="#" class="hover:text-slate-900 dark:hover:text-white transition">X / Twitter</a></li>
-        </ul>
+
+      <div class="md:col-span-3">
+        <p class="text-sm font-semibold text-slate-950 dark:text-white">Contacto</p>
+        <a href="mailto:{{ contact_email }}" class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200">
+          {{ contact_email }}
+          <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17 17 7m0 0H8m9 0v9"/>
+          </svg>
+        </a>
+        <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">Cuéntanos qué quieres mejorar y te responderemos con un siguiente paso claro.</p>
+        <button type="button" data-open-consent class="mt-4 block text-left text-xs text-slate-400 transition hover:text-slate-700 dark:hover:text-slate-200">Preferencias de medición</button>
       </div>
     </div>
-    <div class="border-t border-slate-200 dark:border-white/5">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 text-xs flex flex-col sm:flex-row gap-2 justify-between
-                  text-slate-500 dark:text-slate-500">
-        <span>&copy; {{ app_name }}. Todos los derechos reservados.</span>
-        <span class="inline-flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          Sistemas operativos
-        </span>
+
+    <div class="border-t border-slate-200/80 dark:border-white/[.07]">
+      <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <span>&copy; {{ current_year }} {{ app_name }}. Todos los derechos reservados.</span>
+        <span>Producto, diseño y tecnología con intención.</span>
       </div>
     </div>
   </footer>
+
+  <aside id="analytics-consent" hidden aria-labelledby="analytics-consent-title"
+         class="fixed inset-x-4 bottom-4 z-[60] mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-white/10 dark:bg-ink-700 sm:p-6">
+    <div class="sm:flex sm:items-center sm:gap-6">
+      <div class="flex-1">
+        <p id="analytics-consent-title" class="font-display text-base font-semibold">Tu privacidad, primero</p>
+        <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+          Activamos la medición del sitio únicamente si nos das permiso. Las funciones esenciales siempre están disponibles.
+        </p>
+      </div>
+      <div class="mt-4 flex flex-col gap-2 sm:mt-0 sm:shrink-0">
+        <button type="button" data-consent-choice="granted" class="btn-primary">Permitir medición</button>
+        <button type="button" data-consent-choice="denied" class="btn-secondary">Solo necesarias</button>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    (function () {
+      var navigation = document.querySelector('[data-mobile-nav]');
+      if (!navigation) return;
+
+      var button = navigation.querySelector('[data-menu-toggle]');
+      var panel = document.getElementById('menu-movil');
+      var openIcon = navigation.querySelector('[data-menu-open-icon]');
+      var closeIcon = navigation.querySelector('[data-menu-close-icon]');
+
+      function setMenu(open) {
+        button.setAttribute('aria-expanded', String(open));
+        panel.hidden = !open;
+        openIcon.hidden = open;
+        closeIcon.hidden = !open;
+      }
+
+      button.addEventListener('click', function () {
+        setMenu(button.getAttribute('aria-expanded') !== 'true');
+      });
+      panel.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () { setMenu(false); });
+      });
+      document.addEventListener('click', function (event) {
+        if (!navigation.contains(event.target)) setMenu(false);
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+          setMenu(false);
+          button.focus();
+        }
+      });
+    })();
+
+    window.addEventListener('toast', function (event) {
+      var region = document.getElementById('toast-region');
+      if (!region) return;
+      var toast = document.createElement('div');
+      toast.className = 'rounded-xl bg-slate-950 px-4 py-3 text-sm text-white shadow-xl dark:bg-white dark:text-slate-950';
+      toast.textContent = String(event.detail || '');
+      region.appendChild(toast);
+      window.setTimeout(function () { toast.remove(); }, 4000);
+    });
+  </script>
+
+  <script>
+    (function () {
+      var storageKey = 'gozsyl_analytics_consent';
+      var banner = document.getElementById('analytics-consent');
+      var loaded = false;
+
+      function readChoice() {
+        try { return localStorage.getItem(storageKey); } catch (error) { return null; }
+      }
+
+      function writeChoice(choice) {
+        try { localStorage.setItem(storageKey, choice); } catch (error) {}
+      }
+
+      function loadAnalytics() {
+        if (loaded) return;
+        loaded = true;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-PC7VW4JT';
+        document.head.appendChild(script);
+      }
+
+      function setChoice(choice) {
+        writeChoice(choice);
+        banner.hidden = true;
+        if (choice === 'granted') loadAnalytics();
+        if (choice === 'denied' && loaded) window.location.reload();
+      }
+
+      banner.querySelectorAll('[data-consent-choice]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          setChoice(button.dataset.consentChoice);
+        });
+      });
+
+      document.querySelectorAll('[data-open-consent]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          banner.hidden = false;
+          banner.querySelector('[data-consent-choice="granted"]').focus();
+        });
+      });
+
+      var choice = readChoice();
+      if (choice === 'granted') loadAnalytics();
+      if (choice !== 'granted' && choice !== 'denied') banner.hidden = false;
+    })();
+  </script>
 
   {% block scripts %}{% endblock %}
 </body>

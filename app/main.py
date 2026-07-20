@@ -1,9 +1,9 @@
-"""Punto de entrada de Sistema A.
+"""Punto de entrada de la web corporativa de Gozsyl.
 
-- Crea la app FastAPI.
-- Registra middlewares (sesion firmada, CSP/security headers).
-- Monta routers (publico, auth, admin) y archivos estaticos.
-- Define handlers de excepciones (404 / 401 / 403) que respetan HTML.
+- Crea la aplicación FastAPI.
+- Registra CSP y cabeceras de seguridad.
+- Monta las rutas públicas y los archivos estáticos.
+- Define páginas de error que respetan HTML y JSON.
 """
 
 from __future__ import annotations
@@ -12,15 +12,14 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request, status
-from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse, RedirectResponse, Response
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
-from starlette.middleware.sessions import SessionMiddleware
+from starlette.exceptions import HTTPException
 
 from app.config import settings
 from app.logging_setup import configure_logging
-from app.routers import admin, auth, public
+from app.routers import public
 from app.templating import templates
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -31,12 +30,12 @@ async def lifespan(app: FastAPI):
     """Hooks de arranque/parada."""
     configure_logging()
     logger.info(
-        "Sistema A iniciado: env={} url={}",
+        "Gozsyl iniciado: env={} url={}",
         settings.ENVIRONMENT,
         settings.APP_URL,
     )
     yield
-    logger.info("Sistema A apagandose...")
+    logger.info("Gozsyl apagándose...")
 
 
 app = FastAPI(
@@ -49,20 +48,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ---------------- Middlewares ----------------
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=settings.SECRET_KEY,
-    session_cookie=settings.SESSION_COOKIE_NAME,
-    max_age=settings.SESSION_MAX_AGE,
-    same_site="lax",
-    https_only=settings.is_production,
-)
-
-
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
-    """Inyecta cabeceras de seguridad basicas (XSS, clickjacking, MIME)."""
+    """Inyecta cabeceras de seguridad básicas (XSS, clickjacking y MIME)."""
     response: Response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
@@ -76,7 +64,7 @@ async def security_headers_middleware(request: Request, call_next):
             "Strict-Transport-Security",
             "max-age=31536000; includeSubDomains",
         )
-    # CSP relajado para permitir Tailwind / HTMX / Alpine via CDN.
+    # CSP compatible con las fuentes y la medición consentida declaradas en base.html.
     response.headers.setdefault(
         "Content-Security-Policy",
         (
@@ -84,10 +72,13 @@ async def security_headers_middleware(request: Request, call_next):
             "img-src 'self' data: https:; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com data:; "
-            "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; "
-            "connect-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; "
+            "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com "
+            "https://www.googletagmanager.com; "
+            "frame-src 'none'; "
             "frame-ancestors 'none'; "
-            "base-uri 'self';"
+            "base-uri 'self'; "
+            "form-action 'self';"
         ),
     )
     return response
@@ -98,37 +89,17 @@ STATIC_DIR.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
-# ---------------- Archivos raiz ----------------
-@app.get("/ads.txt", include_in_schema=False)
-async def ads_txt():
-    return FileResponse(str(STATIC_DIR / "ads.txt"), media_type="text/plain")
-
-
 # ---------------- Routers ----------------
 app.include_router(public.router)
-app.include_router(auth.router)
-app.include_router(admin.router)
 
 
 # ---------------- Exception handlers ----------------
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    """Convierte 401/403/404 en paginas HTML cuando aplica.
-
-    El 307 con header Location lo usamos como atajo de "redirect"
-    desde dependencias (`require_login`) — lo respetamos tal cual.
-    """
-    if exc.status_code == status.HTTP_307_TEMPORARY_REDIRECT and "Location" in (
-        exc.headers or {}
-    ):
-        return RedirectResponse(
-            url=exc.headers["Location"],
-            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-        )
-
+    """Convierte errores HTTP en HTML cuando el navegador lo solicita."""
     accepts_html = "text/html" in request.headers.get("accept", "")
     if not accepts_html:
-        # API JSON usa el comportamiento por defecto.
+        # La API JSON usa el comportamiento predeterminado.
         from fastapi.responses import JSONResponse
 
         return JSONResponse(
@@ -141,7 +112,14 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         return templates.TemplateResponse(
             request,
             "public/404.html",
-            {"user": request.session.get("user"), "page_title": "No encontrado"},
+            {
+                "page_title": "Página no encontrada",
+                "error_code": 404,
+                "error_title": "Página no encontrada",
+                "error_message": (
+                    "La página que buscas no existe, cambió de dirección o ya no está disponible."
+                ),
+            },
             status_code=404,
         )
 
@@ -150,8 +128,12 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             request,
             "public/404.html",  # reusamos la misma vista
             {
-                "user": request.session.get("user"),
                 "page_title": "Acceso restringido",
+                "error_code": exc.status_code,
+                "error_title": "Acceso restringido",
+                "error_message": (
+                    "No tienes permiso para ver esta página."
+                ),
             },
             status_code=exc.status_code,
         )
@@ -159,6 +141,11 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     return templates.TemplateResponse(
         request,
         "public/404.html",
-        {"user": request.session.get("user"), "page_title": "Error"},
+        {
+            "page_title": "No pudimos completar la solicitud",
+            "error_code": exc.status_code,
+            "error_title": "No pudimos completar la solicitud",
+            "error_message": "Inténtalo de nuevo o escríbenos si el problema continúa.",
+        },
         status_code=exc.status_code,
     )

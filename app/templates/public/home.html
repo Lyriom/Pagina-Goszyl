@@ -1,275 +1,462 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 {# ====================== HERO ====================== #}
 <section class="relative overflow-hidden">
   <div class="aurora"></div>
+  <div class="pointer-events-none absolute inset-0 bg-grid-light opacity-50 [background-size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_85%)] dark:bg-grid-dark dark:opacity-40"></div>
 
-  {# Grid sutil de fondo #}
-  <div class="absolute inset-0 bg-grid-light dark:bg-grid-dark
-              [background-size:42px_42px]
-              [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]
-              opacity-70 pointer-events-none"></div>
+  <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-4 pb-20 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:grid-cols-12 lg:gap-12 lg:px-8 lg:pb-28 lg:pt-32">
+    <div class="lg:col-span-7">
+      <p class="eyebrow">Consultoría tecnológica · Delaware, EE. UU.</p>
+      <h1 class="text-balance mt-6 max-w-4xl font-display text-[2.7rem] font-semibold leading-[1.02] tracking-[-.055em] text-slate-950 sm:text-6xl lg:text-[4.6rem] dark:text-white">
+        Convertimos procesos complejos en
+        <span class="text-gradient">productos digitales que funcionan.</span>
+      </h1>
+      <p class="text-pretty mt-7 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8 dark:text-slate-300">
+        Diseñamos y construimos automatizaciones, plataformas web, inteligencia artificial aplicada y sistemas de datos para equipos que necesitan avanzar con claridad, velocidad y control.
+      </p>
 
-  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-24 text-center">
-    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs
-                glass text-slate-600 dark:text-slate-300">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-      Aceptando nuevos proyectos &middot; 2026
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+        <a href="mailto:{{ contact_email }}?subject=Quiero%20hablar%20sobre%20un%20proyecto&body=Hola%20Gozsyl%2C%0A%0AQuiero%20mejorar%20el%20siguiente%20proceso%20o%20producto%3A%0A"
+           class="btn-primary w-full sm:w-auto">
+          Cuéntanos tu reto
+          <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5"/>
+          </svg>
+        </a>
+        <a href="#proyectos" class="btn-secondary w-full sm:w-auto">
+          Ver proyecto destacado
+        </a>
+      </div>
+
+      <div class="mt-10 flex flex-wrap gap-x-7 gap-y-3 border-t border-slate-200/80 pt-6 text-xs font-semibold uppercase tracking-[.12em] text-slate-500 dark:border-white/[.08] dark:text-slate-500">
+        <span>Estrategia</span>
+        <span>Diseño</span>
+        <span>Desarrollo</span>
+        <span>Operación</span>
+      </div>
     </div>
 
-    <h1 class="mt-6 font-display text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05]">
-      Automatizamos lo que<br/>
-      <span class="text-gradient">tu negocio repite cada dia.</span>
-    </h1>
+    {# Diagrama visual de una entrega digital #}
+    <div class="relative hidden sm:block lg:col-span-5" aria-hidden="true">
+      <div class="absolute -inset-8 rounded-full bg-brand-500/10 blur-3xl"></div>
+      <div class="glass relative overflow-hidden rounded-[1.75rem] p-4 shadow-glow sm:p-5">
+        <div class="flex items-center justify-between border-b border-slate-200/80 pb-4 dark:border-white/[.08]">
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-rose-400/80"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-amber-400/80"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-400/80"></span>
+          </div>
+          <span class="rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-[.65rem] font-semibold uppercase tracking-[.12em] text-slate-500 dark:border-white/10 dark:bg-white/[.04] dark:text-slate-400">Sistema en diseño</span>
+        </div>
 
-    <p class="mt-7 max-w-2xl mx-auto text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-      Somos una consultora boutique en <strong class="text-slate-900 dark:text-white">automatizacion, landing pages,
-      chatbots y analisis de datos</strong>. Diseniamos, construimos y operamos sistemas que reducen costos y
-      aceleran resultados.
-    </p>
+        <div class="mt-5 rounded-2xl border border-slate-200 bg-white/80 p-5 dark:border-white/[.08] dark:bg-ink-800/80">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[.66rem] font-bold uppercase tracking-[.16em] text-brand-600 dark:text-brand-300">Flujo de valor</p>
+              <p class="mt-1 font-display text-lg font-semibold">De la señal al resultado</p>
+            </div>
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-signal text-slate-950">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 17 10 11l4 4 6-8M16 7h4v4"/>
+              </svg>
+            </span>
+          </div>
 
-    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-      <a href="#servicios"
-         class="btn-primary px-6 py-3 rounded-lg font-medium inline-flex items-center gap-2">
-        Ver servicios
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-      </a>
-      <a href="/acerca"
-         class="px-6 py-3 rounded-lg font-medium inline-flex items-center gap-2
-                border border-slate-300 dark:border-white/10
-                text-slate-700 dark:text-slate-200
-                hover:bg-slate-100 dark:hover:bg-white/5 transition">
-        Sobre nosotros
-      </a>
+          <div class="mt-6 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-3 text-center dark:border-white/[.07] dark:bg-white/[.035]">
+              <span class="mx-auto grid h-8 w-8 place-items-center rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-300">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 18.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/>
+                </svg>
+              </span>
+              <span class="mt-2 block text-[.66rem] font-semibold">Entrada</span>
+            </div>
+            <svg class="h-4 w-4 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-4-4 4 4-4 4"/>
+            </svg>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-3 text-center dark:border-white/[.07] dark:bg-white/[.035]">
+              <span class="mx-auto grid h-8 w-8 place-items-center rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-300">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v4m0 10v4m9-9h-4M7 12H3m14.36-5.36-2.83 2.83M9.47 14.53l-2.83 2.83m10.72 0-2.83-2.83M9.47 9.47 6.64 6.64"/>
+                </svg>
+              </span>
+              <span class="mt-2 block text-[.66rem] font-semibold">Lógica</span>
+            </div>
+            <svg class="h-4 w-4 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-4-4 4 4-4 4"/>
+            </svg>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 px-2 py-3 text-center dark:border-white/[.07] dark:bg-white/[.035]">
+              <span class="mx-auto grid h-8 w-8 place-items-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12 4 4L19 6"/>
+                </svg>
+              </span>
+              <span class="mt-2 block text-[.66rem] font-semibold">Resultado</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-slate-200 bg-white/70 p-4 dark:border-white/[.08] dark:bg-white/[.035]">
+            <span class="block text-[.65rem] font-bold uppercase tracking-[.14em] text-slate-400">Decisiones</span>
+            <span class="mt-2 block font-display text-sm font-semibold">Objetivos claros</span>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white/70 p-4 dark:border-white/[.08] dark:bg-white/[.035]">
+            <span class="block text-[.65rem] font-bold uppercase tracking-[.14em] text-slate-400">Entrega</span>
+            <span class="mt-2 block font-display text-sm font-semibold">Avances visibles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ====================== PROYECTO DESTACADO ====================== #}
+<section id="proyectos" class="scroll-mt-24 px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-9 max-w-2xl">
+      <p class="eyebrow">Trabajo seleccionado</p>
+      <h2 class="text-balance mt-4 font-display text-3xl font-semibold tracking-[-.04em] sm:text-5xl">
+        El trabajo habla primero.
+      </h2>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-400">
+        Diseñamos experiencias completas: desde la estrategia y la interfaz hasta la lógica que las mantiene en funcionamiento.
+      </p>
     </div>
 
-    {# Logos / social proof discreto #}
-    <div class="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-3
-                text-xs uppercase tracking-widest text-slate-400 dark:text-slate-500">
-      <span>Python</span><span class="opacity-40">&bull;</span>
-      <span>FastAPI</span><span class="opacity-40">&bull;</span>
-      <span>n8n</span><span class="opacity-40">&bull;</span>
-      <span>OpenAI</span><span class="opacity-40">&bull;</span>
-      <span>PostgreSQL</span><span class="opacity-40">&bull;</span>
-      <span>Next.js</span>
-    </div>
+    <article class="relative overflow-hidden rounded-[2rem] border border-[#b8863b]/30 bg-[#090b10] text-white shadow-project">
+      <div class="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#b8863b]/20 blur-[100px]"></div>
+      <div class="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-[#3fd0e0]/10 blur-[100px]"></div>
+
+      <div class="relative grid items-center gap-10 p-6 sm:p-9 lg:grid-cols-12 lg:gap-12 lg:p-12">
+        <div class="lg:col-span-5">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="rounded-full border border-[#b8863b]/40 bg-[#b8863b]/10 px-3 py-1 text-[.68rem] font-bold uppercase tracking-[.16em] text-[#e8c78a]">Proyecto destacado</span>
+            <span class="text-xs text-white/65">Comercio electrónico</span>
+          </div>
+
+          <p class="mt-7 font-display text-sm font-medium tracking-[.34em] text-[#e8c78a]">AUREXIR</p>
+          <h3 class="text-balance mt-4 font-display text-3xl font-semibold tracking-[-.04em] sm:text-4xl">
+            Perfumería masculina convertida en una experiencia digital premium.
+          </h3>
+          <p class="text-pretty mt-5 leading-7 text-white/65">
+            Una plataforma bilingüe para descubrir y comprar fragancias de diseñador y nicho. Integra catálogo, búsqueda, filtros, fichas olfativas, carrito, cuenta y opciones de compra directa en una experiencia responsive.
+          </p>
+
+          <div class="mt-7 flex flex-wrap gap-2 text-xs text-white/65">
+            <span class="rounded-full border border-white/10 bg-white/[.05] px-3 py-1.5">UX/UI</span>
+            <span class="rounded-full border border-white/10 bg-white/[.05] px-3 py-1.5">Full-stack</span>
+            <span class="rounded-full border border-white/10 bg-white/[.05] px-3 py-1.5">E-commerce</span>
+            <span class="rounded-full border border-white/10 bg-white/[.05] px-3 py-1.5">EN / ES</span>
+          </div>
+
+          <dl class="mt-8 grid grid-cols-3 gap-3 border-y border-white/10 py-5">
+            <div>
+              <dt class="text-[.65rem] uppercase tracking-[.14em] text-white/65">Catálogo</dt>
+              <dd class="mt-1 font-display text-xl font-semibold text-[#e8c78a]">20</dd>
+              <dd class="text-xs text-white/65">productos</dd>
+            </div>
+            <div>
+              <dt class="text-[.65rem] uppercase tracking-[.14em] text-white/65">Exploración</dt>
+              <dd class="mt-1 font-display text-xl font-semibold text-[#e8c78a]">4</dd>
+              <dd class="text-xs text-white/65">categorías</dd>
+            </div>
+            <div>
+              <dt class="text-[.65rem] uppercase tracking-[.14em] text-white/65">Contenido</dt>
+              <dd class="mt-1 font-display text-xl font-semibold text-[#e8c78a]">2</dd>
+              <dd class="text-xs text-white/65">idiomas</dd>
+            </div>
+          </dl>
+
+          <a href="https://aurexir.com" target="_blank" rel="noopener noreferrer"
+             class="mt-8 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#b8863b] px-5 py-3 text-sm font-bold text-[#0d0e12] transition hover:-translate-y-0.5 hover:bg-[#e8c78a] focus-visible:outline-[#e8c78a]">
+            Visitar aurexir.com
+            <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17 17 7m0 0H8m9 0v9"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="lg:col-span-7">
+          <a href="https://aurexir.com" target="_blank" rel="noopener noreferrer"
+             class="group block overflow-hidden rounded-2xl border border-white/10 bg-[#0d0e12] shadow-2xl focus-visible:outline-[#e8c78a]"
+             aria-label="Abrir el sitio web de Aurexir en una pestaña nueva">
+            <div class="flex h-10 items-center gap-2 border-b border-white/10 px-4">
+              <span class="h-2.5 w-2.5 rounded-full bg-[#ff6b6b]/80"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-[#ffd166]/80"></span>
+              <span class="h-2.5 w-2.5 rounded-full bg-[#61d095]/80"></span>
+              <span class="ml-3 truncate text-[.65rem] text-white/65">aurexir.com</span>
+              <svg class="ml-auto h-3.5 w-3.5 text-white/35 transition group-hover:text-[#3fd0e0]" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17 17 7m0 0H8m9 0v9"/>
+              </svg>
+            </div>
+            <div class="aspect-[1.44/1] overflow-hidden bg-[#0d0e12]">
+              <img src="/static/images/aurexir-featured.webp"
+                   alt="Página de inicio de Aurexir, una perfumería masculina digital"
+                   width="1200" height="833" loading="lazy" decoding="async"
+                   class="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.015]" />
+            </div>
+          </a>
+        </div>
+      </div>
+    </article>
   </div>
 </section>
 
 {# ====================== SERVICIOS ====================== #}
-<section id="servicios" class="relative">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-    <div class="max-w-2xl">
-      <p class="text-xs uppercase tracking-[0.2em] text-brand-400">Servicios</p>
-      <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight">
-        Cuatro practicas que mueven la aguja
-      </h2>
-      <p class="mt-3 text-slate-600 dark:text-slate-400">
-        Trabajamos enfocados en lo que realmente impacta los KPIs: ingresos, conversion y tiempo del equipo.
+<section id="servicios" class="scroll-mt-24 border-y border-slate-200/80 bg-white/55 dark:border-white/[.07] dark:bg-white/[.018]">
+  <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+    <div class="grid gap-8 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-7">
+        <p class="eyebrow">Capacidades</p>
+        <h2 class="text-balance mt-4 max-w-3xl font-display text-3xl font-semibold tracking-[-.04em] sm:text-5xl">
+          Tecnología útil para retos reales de negocio.
+        </h2>
+      </div>
+      <p class="text-pretty leading-7 text-slate-600 lg:col-span-5 lg:pl-10 dark:text-slate-400">
+        Unimos estrategia, experiencia de usuario e ingeniería para construir soluciones que el equipo entiende, adopta y puede hacer crecer.
       </p>
     </div>
 
-    <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-
-      {# Automatizacion #}
-      <div class="card-hover glass rounded-2xl p-6 group">
-        <div class="w-11 h-11 rounded-xl grid place-items-center
-                    bg-gradient-to-br from-brand-500/20 to-fuchsia-500/20
-                    text-brand-500 dark:text-brand-300 ring-1 ring-brand-500/20">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V3m0 18v-3m6-6h3M3 12h3m12.36-6.36l2.12-2.12M3.52 20.48l2.12-2.12m0-12.72L3.52 3.52m16.96 16.96l-2.12-2.12M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
-          </svg>
+    <div class="mt-12 grid gap-5 lg:grid-cols-3">
+      <article class="glass card-hover rounded-3xl p-6 sm:p-8">
+        <div class="flex items-start justify-between">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+            <svg class="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.36-6.36-2.12 2.12M7.76 16.24l-2.12 2.12m12.72 0-2.12-2.12M7.76 7.76 5.64 5.64M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/>
+            </svg>
+          </span>
+          <span class="font-display text-sm text-slate-400">01</span>
         </div>
-        <h3 class="mt-5 font-display font-semibold text-lg">Automatizacion</h3>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Workflows en n8n, Zapier o codigo a medida. Integramos tus apps, CRMs y ERPs para eliminar trabajo manual.
+        <h3 class="mt-7 font-display text-xl font-semibold">Automatización e IA aplicada</h3>
+        <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
+          Reducimos tareas repetitivas y tiempos de respuesta mediante flujos, asistentes e integraciones conectadas con la operación real.
         </p>
-        <ul class="mt-4 space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-brand-400"></span>Integraciones API</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-brand-400"></span>ETL y sincronizacion</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-brand-400"></span>Procesos backoffice</li>
+        <ul class="mt-6 space-y-3 border-t border-slate-200/80 pt-5 text-sm text-slate-600 dark:border-white/[.08] dark:text-slate-400">
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span>Agentes y asistentes con IA</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span>Flujos de trabajo e integraciones API</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span>Automatización de operaciones</li>
         </ul>
-      </div>
+      </article>
 
-      {# Landing pages #}
-      <div class="card-hover glass rounded-2xl p-6 group">
-        <div class="w-11 h-11 rounded-xl grid place-items-center
-                    bg-gradient-to-br from-cyan-500/20 to-brand-500/20
-                    text-cyan-500 dark:text-cyan-300 ring-1 ring-cyan-500/20">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zm0 4h18M7 15h4"/>
-          </svg>
+      <article class="glass card-hover rounded-3xl p-6 sm:p-8">
+        <div class="flex items-start justify-between">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-300">
+            <svg class="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M4 5.5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Zm-2 4.5h20M6 14h4"/>
+            </svg>
+          </span>
+          <span class="font-display text-sm text-slate-400">02</span>
         </div>
-        <h3 class="mt-5 font-display font-semibold text-lg">Landing pages</h3>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Sitios rapidos, optimizados para SEO y conversion. Copy, diseno y desarrollo en un mismo equipo.
+        <h3 class="mt-7 font-display text-xl font-semibold">Productos y plataformas web</h3>
+        <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
+          Creamos sitios comerciales, comercios electrónicos, portales y herramientas internas con una experiencia rápida, clara y accesible.
         </p>
-        <ul class="mt-4 space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-cyan-400"></span>SEO y Core Web Vitals</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-cyan-400"></span>A/B testing</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-cyan-400"></span>Lead capture y CRM</li>
+        <ul class="mt-6 space-y-3 border-t border-slate-200/80 pt-5 text-sm text-slate-600 dark:border-white/[.08] dark:text-slate-400">
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-500"></span>Estrategia de producto y UX/UI</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-500"></span>Desarrollo web full-stack</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-500"></span>SEO técnico y analítica</li>
         </ul>
-      </div>
+      </article>
 
-      {# Chatbots #}
-      <div class="card-hover glass rounded-2xl p-6 group">
-        <div class="w-11 h-11 rounded-xl grid place-items-center
-                    bg-gradient-to-br from-fuchsia-500/20 to-pink-500/20
-                    text-fuchsia-500 dark:text-fuchsia-300 ring-1 ring-fuchsia-500/20">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12a8.5 8.5 0 0 1-12.4 7.6L3 21l1.4-5.6A8.5 8.5 0 1 1 21 12z"/>
-          </svg>
+      <article class="glass card-hover rounded-3xl p-6 sm:p-8">
+        <div class="flex items-start justify-between">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+            <svg class="h-6 w-6" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M4 18V9m5 9V5m5 13v-6m5 6V3M2 21h20"/>
+            </svg>
+          </span>
+          <span class="font-display text-sm text-slate-400">03</span>
         </div>
-        <h3 class="mt-5 font-display font-semibold text-lg">Chatbots con IA</h3>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Asistentes para WhatsApp, web y Telegram. Conectados a tus datos con RAG y llamadas a herramientas.
+        <h3 class="mt-7 font-display text-xl font-semibold">Datos e integraciones</h3>
+        <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
+          Conectamos herramientas y fuentes dispersas para que los datos lleguen completos, a tiempo y en una forma que permita decidir.
         </p>
-        <ul class="mt-4 space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-fuchsia-400"></span>Atencion 24/7</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-fuchsia-400"></span>Calificacion de leads</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-fuchsia-400"></span>Soporte interno</li>
+        <ul class="mt-6 space-y-3 border-t border-slate-200/80 pt-5 text-sm text-slate-600 dark:border-white/[.08] dark:text-slate-400">
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"></span>APIs y arquitectura de integración</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"></span>Canalizaciones y calidad de datos</li>
+          <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"></span>Tableros e indicadores útiles</li>
         </ul>
-      </div>
-
-      {# Analisis de datos #}
-      <div class="card-hover glass rounded-2xl p-6 group">
-        <div class="w-11 h-11 rounded-xl grid place-items-center
-                    bg-gradient-to-br from-emerald-500/20 to-cyan-500/20
-                    text-emerald-500 dark:text-emerald-300 ring-1 ring-emerald-500/20">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7 14l4-4 4 4 5-6"/>
-          </svg>
-        </div>
-        <h3 class="mt-5 font-display font-semibold text-lg">Analisis de datos</h3>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Dashboards, modelos predictivos y data warehouses. Decisiones basadas en evidencia, no en intuicion.
-        </p>
-        <ul class="mt-4 space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-emerald-400"></span>Dashboards en Metabase / PowerBI</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-emerald-400"></span>Pipelines ELT</li>
-          <li class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-emerald-400"></span>Forecasting y ML</li>
-        </ul>
-      </div>
+      </article>
     </div>
   </div>
 </section>
 
-{# ====================== METRICAS ====================== #}
+{# ====================== PRINCIPIOS ====================== #}
 <section class="relative">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="text-center">
-        <p class="font-display text-4xl sm:text-5xl font-semibold text-gradient">+50</p>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Proyectos entregados</p>
+  <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="lg:col-span-4">
+        <p class="eyebrow">Cómo entregamos</p>
+        <h2 class="text-balance mt-4 font-display text-3xl font-semibold tracking-[-.04em] sm:text-4xl">
+          Menos incertidumbre. Más claridad en cada decisión.
+        </h2>
+        <p class="mt-4 leading-7 text-slate-600 dark:text-slate-400">
+          La tecnología importa, pero el modo de construirla determina si se convierte en valor o en otra carga para el equipo.
+        </p>
       </div>
-      <div class="text-center">
-        <p class="font-display text-4xl sm:text-5xl font-semibold text-gradient">98%</p>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Uptime promedio</p>
-      </div>
-      <div class="text-center">
-        <p class="font-display text-4xl sm:text-5xl font-semibold text-gradient">+5</p>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Anios de experiencia</p>
-      </div>
-      <div class="text-center">
-        <p class="font-display text-4xl sm:text-5xl font-semibold text-gradient">24/7</p>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Monitoreo activo</p>
+
+      <div class="grid gap-px overflow-hidden rounded-3xl border border-slate-200 bg-slate-200 sm:grid-cols-2 lg:col-span-8 dark:border-white/[.08] dark:bg-white/[.08]">
+        <div class="bg-[#f7f8fb] p-6 sm:p-8 dark:bg-ink-850">
+          <span class="font-display text-sm font-semibold text-brand-600 dark:text-brand-300">01</span>
+          <h3 class="mt-4 font-display text-lg font-semibold">Alcance y objetivos claros</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">Acordamos qué problema resolver, para quién y cómo sabremos que la solución es útil.</p>
+        </div>
+        <div class="bg-[#f7f8fb] p-6 sm:p-8 dark:bg-ink-850">
+          <span class="font-display text-sm font-semibold text-brand-600 dark:text-brand-300">02</span>
+          <h3 class="mt-4 font-display text-lg font-semibold">Entregas visibles y frecuentes</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">Validamos avances reales con tu equipo para detectar riesgos y oportunidades a tiempo.</p>
+        </div>
+        <div class="bg-[#f7f8fb] p-6 sm:p-8 dark:bg-ink-850">
+          <span class="font-display text-sm font-semibold text-brand-600 dark:text-brand-300">03</span>
+          <h3 class="mt-4 font-display text-lg font-semibold">Propiedad y autonomía</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">Entregamos código y documentación comprensibles para que el conocimiento permanezca contigo.</p>
+        </div>
+        <div class="bg-[#f7f8fb] p-6 sm:p-8 dark:bg-ink-850">
+          <span class="font-display text-sm font-semibold text-brand-600 dark:text-brand-300">04</span>
+          <h3 class="mt-4 font-display text-lg font-semibold">Seguridad desde el diseño</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">Privacidad, acceso, observabilidad y mantenimiento forman parte del producto desde el inicio.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 {# ====================== PROCESO ====================== #}
-<section class="relative">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-    <div class="max-w-2xl">
-      <p class="text-xs uppercase tracking-[0.2em] text-brand-400">Como trabajamos</p>
-      <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight">
-        Un proceso simple y medible
-      </h2>
+<section id="proceso" class="scroll-mt-24 border-y border-slate-200/80 bg-slate-950 text-white dark:border-white/[.07]">
+  <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div class="max-w-3xl">
+        <p class="eyebrow !text-brand-300">Nuestro proceso</p>
+        <h2 class="text-balance mt-4 font-display text-3xl font-semibold tracking-[-.04em] sm:text-5xl">
+          De una conversación a un sistema que puede crecer.
+        </h2>
+      </div>
+      <p class="max-w-sm text-sm leading-6 text-white/55">Cada etapa reduce una incógnita y deja un resultado concreto para decidir el siguiente paso.</p>
     </div>
 
-    <div class="mt-12 grid gap-5 md:grid-cols-3">
-      <div class="glass rounded-2xl p-6 relative">
-        <span class="absolute -top-3 -left-3 w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-fuchsia-500 grid place-items-center text-white font-display font-semibold shadow-glow">01</span>
-        <h3 class="mt-3 font-display font-semibold text-lg">Diagnostico</h3>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Mapeamos procesos, datos y oportunidades. Definimos metricas de exito antes de tocar codigo.
-        </p>
-      </div>
-      <div class="glass rounded-2xl p-6 relative">
-        <span class="absolute -top-3 -left-3 w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-500 grid place-items-center text-white font-display font-semibold shadow-glow">02</span>
-        <h3 class="mt-3 font-display font-semibold text-lg">Construccion</h3>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Iteraciones cortas con entregables semanales. Codigo limpio, infraestructura observable.
-        </p>
-      </div>
-      <div class="glass rounded-2xl p-6 relative">
-        <span class="absolute -top-3 -left-3 w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 grid place-items-center text-white font-display font-semibold shadow-glow">03</span>
-        <h3 class="mt-3 font-display font-semibold text-lg">Operacion</h3>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          Monitoreo, alertas y mejora continua. Acompaniamos al equipo hasta que todo funciona solo.
-        </p>
+    <ol class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <li class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[.035] p-6">
+        <span class="font-display text-5xl font-semibold text-white/[.08]">01</span>
+        <h3 class="mt-6 font-display text-xl font-semibold">Descubrir</h3>
+        <p class="mt-3 text-sm leading-6 text-white/55">Entendemos el contexto, las personas, los datos y las restricciones antes de proponer.</p>
+      </li>
+      <li class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[.035] p-6">
+        <span class="font-display text-5xl font-semibold text-white/[.08]">02</span>
+        <h3 class="mt-6 font-display text-xl font-semibold">Diseñar</h3>
+        <p class="mt-3 text-sm leading-6 text-white/55">Convertimos hallazgos en una experiencia, arquitectura y plan de entrega comprensibles.</p>
+      </li>
+      <li class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[.035] p-6">
+        <span class="font-display text-5xl font-semibold text-white/[.08]">03</span>
+        <h3 class="mt-6 font-display text-xl font-semibold">Construir</h3>
+        <p class="mt-3 text-sm leading-6 text-white/55">Desarrollamos en ciclos cortos, probamos lo importante y compartimos avances reales.</p>
+      </li>
+      <li class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[.035] p-6">
+        <span class="font-display text-5xl font-semibold text-white/[.08]">04</span>
+        <h3 class="mt-6 font-display text-xl font-semibold">Mejorar</h3>
+        <p class="mt-3 text-sm leading-6 text-white/55">Observamos el uso, corregimos fricción y evolucionamos el sistema con nueva evidencia.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+{# ====================== GOZSYL ====================== #}
+<section class="relative overflow-hidden">
+  <div class="aurora"></div>
+  <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 sm:py-24 lg:grid-cols-12 lg:px-8">
+    <div class="lg:col-span-7">
+      <p class="eyebrow">Acerca de Gozsyl</p>
+      <h2 class="text-balance mt-4 font-display text-3xl font-semibold tracking-[-.04em] sm:text-5xl">
+        Un socio técnico que piensa en producto y negocio.
+      </h2>
+      <p class="text-pretty mt-5 max-w-3xl text-base leading-7 text-slate-600 dark:text-slate-300">
+        Gozsyl es una empresa de tecnología constituida en Delaware, Estados Unidos. Ayudamos a equipos a modernizar operaciones, lanzar productos digitales y convertir datos dispersos en decisiones útiles.
+      </p>
+      <a href="/acerca" class="btn-secondary mt-7">
+        Conocer a Gozsyl
+        <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5"/>
+        </svg>
+      </a>
+    </div>
+    <div class="lg:col-span-5">
+      <div class="glass rounded-3xl p-6 sm:p-8">
+        <p class="text-xs font-bold uppercase tracking-[.16em] text-slate-400">Una sola conversación</p>
+        <ul class="mt-6 space-y-5">
+          <li class="flex items-start gap-4">
+            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+              <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12 4 4L19 6"/></svg>
+            </span>
+            <div><p class="font-display font-semibold">Estrategia y ejecución</p><p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Las decisiones de negocio y las técnicas avanzan juntas.</p></div>
+          </li>
+          <li class="flex items-start gap-4">
+            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+              <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12 4 4L19 6"/></svg>
+            </span>
+            <div><p class="font-display font-semibold">Diseño e ingeniería</p><p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Cuidamos tanto la experiencia visible como el sistema que la sostiene.</p></div>
+          </li>
+          <li class="flex items-start gap-4">
+            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300">
+              <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m5 12 4 4L19 6"/></svg>
+            </span>
+            <div><p class="font-display font-semibold">Entrega y continuidad</p><p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Documentamos, acompañamos y dejamos una base lista para evolucionar.</p></div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
-{# ====================== ULTIMOS POSTS ====================== #}
-<section class="relative border-t border-slate-200 dark:border-white/5">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-    <div class="flex items-end justify-between flex-wrap gap-4">
+{% if recent_posts %}
+{# ====================== IDEAS ====================== #}
+<section class="border-t border-slate-200/80 dark:border-white/[.07]">
+  <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p class="text-xs uppercase tracking-[0.2em] text-brand-400">Blog</p>
-        <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Desde el laboratorio</h2>
-        <p class="mt-3 text-slate-600 dark:text-slate-400">Articulos sobre IA, automatizacion y producto.</p>
+        <p class="eyebrow">Ideas</p>
+        <h2 class="mt-4 font-display text-3xl font-semibold tracking-[-.04em] sm:text-4xl">Notas desde la práctica.</h2>
+        <p class="mt-3 text-slate-600 dark:text-slate-400">Producto, inteligencia artificial, automatización y datos sin ruido.</p>
       </div>
-      <a href="/blog" class="text-sm font-medium text-brand-500 dark:text-brand-300 hover:underline inline-flex items-center gap-1">
-        Ver todos
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      <a href="/blog" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200">
+        Ver todas las ideas
+        <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5"/></svg>
       </a>
     </div>
 
-    {% if recent_posts %}
-      <div class="mt-12 grid gap-6 md:grid-cols-3">
-        {% for post in recent_posts %}
-          {% include "public/_post_card.html" %}
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="mt-12 glass rounded-2xl p-10 text-center">
-        <p class="text-slate-500 dark:text-slate-400">Pronto publicaremos los primeros articulos.</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-{# ====================== CTA ====================== #}
-<section class="relative">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-    <div class="relative overflow-hidden rounded-3xl p-10 sm:p-14
-                bg-gradient-to-br from-brand-600 via-fuchsia-600 to-cyan-500
-                shadow-glow">
-      <div class="absolute inset-0 bg-grid-dark [background-size:32px_32px] opacity-20"></div>
-      <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div class="max-w-2xl">
-          <h2 class="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-white">
-            Hagamos que tu operacion corra sola.
-          </h2>
-          <p class="mt-3 text-white/80">
-            Cuentanos tu caso. En menos de 48 horas te enviamos un diagnostico gratuito.
-          </p>
-        </div>
-        <a href="mailto:hola@gozsyl.com"
-           class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium
-                  bg-white text-slate-900 hover:bg-slate-100 transition shadow-lg whitespace-nowrap">
-          Hablemos
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </a>
-      </div>
+    <div class="mt-10 grid gap-6 md:grid-cols-3">
+      {% for post in recent_posts %}
+        {% include "public/_post_card.html" %}
+      {% endfor %}
     </div>
   </div>
 </section>
+{% endif %}
 
+{# ====================== CTA ====================== #}
+<section id="contacto" class="scroll-mt-24 px-4 pb-12 pt-8 sm:px-6 sm:pb-16 lg:px-8">
+  <div class="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-brand-600 px-6 py-12 text-white shadow-glow sm:px-10 sm:py-14 lg:px-14">
+    <div class="pointer-events-none absolute inset-0 bg-grid-dark opacity-15 [background-size:36px_36px]"></div>
+    <div class="absolute -right-28 -top-28 h-80 w-80 rounded-full bg-cyan-300/20 blur-[90px]"></div>
+    <div class="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div class="max-w-3xl">
+        <p class="text-xs font-bold uppercase tracking-[.16em] text-white/60">El siguiente paso</p>
+        <h2 class="text-balance mt-4 font-display text-3xl font-semibold tracking-[-.04em] sm:text-5xl">
+          ¿Qué proceso, producto o experiencia quieres mejorar?
+        </h2>
+        <p class="mt-4 max-w-2xl leading-7 text-white/75">
+          Cuéntanos el contexto. Te responderemos con preguntas útiles y un siguiente paso claro.
+        </p>
+      </div>
+      <a href="mailto:{{ contact_email }}?subject=Nuevo%20proyecto%20para%20Gozsyl&body=Hola%20Gozsyl%2C%0A%0AQuiero%20conversar%20sobre%3A%0A"
+         class="btn-accent w-full shrink-0 sm:w-auto">
+        Escribir a Gozsyl
+        <svg class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-5-5 5 5-5 5"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
 {% endblock %}

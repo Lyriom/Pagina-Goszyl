@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8578ff"/>
+      <stop offset="1" stop-color="#6558f5"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#6558f5" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#6558f5" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0v48" fill="none" stroke="#fff" stroke-opacity=".045"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#080b12"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="1050" cy="40" r="370" fill="url(#glow)"/>
+  <circle cx="1100" cy="535" r="155" fill="#0ea5c9" opacity=".08"/>
+
+  <g transform="translate(72 66)">
+    <rect width="62" height="62" rx="19" fill="url(#brand)"/>
+    <text x="31" y="41" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="middle">G</text>
+    <circle cx="58" cy="58" r="15" fill="#baf56a"/>
+    <text x="84" y="29" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">Gozsyl</text>
+    <text x="84" y="51" fill="#8d99ab" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">DIGITAL SYSTEMS</text>
+  </g>
+
+  <text x="72" y="224" fill="#aaa1ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="3">PRODUCTO · IA · AUTOMATIZACIÓN</text>
+  <text x="72" y="307" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.5">Productos digitales que</text>
+  <text x="72" y="380" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.5">convierten complejidad en valor.</text>
+  <text x="72" y="445" fill="#9aa6b8" font-family="Arial, Helvetica, sans-serif" font-size="23">Estrategia, diseño, desarrollo y operación en un solo equipo.</text>
+
+  <g transform="translate(72 519)">
+    <circle cx="7" cy="7" r="7" fill="#baf56a"/>
+    <text x="29" y="13" fill="#9aa6b8" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="1.5">CONSTITUIDA EN DELAWARE, ESTADOS UNIDOS</text>
+  </g>
+
+  <g transform="translate(1000 493)" opacity=".8">
+    <circle cx="0" cy="0" r="11" fill="#6558f5"/>
+    <path d="M15 0h44" stroke="#6558f5" stroke-width="3"/>
+    <circle cx="74" cy="0" r="11" fill="#0ea5c9"/>
+    <path d="M89 0h44" stroke="#0ea5c9" stroke-width="3"/>
+    <circle cx="148" cy="0" r="11" fill="#baf56a"/>
+  </g>
+</svg>

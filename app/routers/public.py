@@ -1,4 +1,4 @@
-"""Rutas publicas: landing, acerca, blog y SEO (sitemap/robots)."""
+"""Rutas públicas: landing, acerca, blog y SEO (sitemap/robots)."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from math import ceil
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import PlainTextResponse, Response
 
-from app.auth.dependencies import CurrentUser, DBSession
 from app.config import settings
+from app.database import DBSession
 from app.services import post_service
 from app.templating import templates
 
@@ -17,31 +17,36 @@ router = APIRouter(tags=["public"])
 
 
 @router.get("/", response_class=Response)
-async def home(request: Request, db: DBSession, user: CurrentUser):
-    """Landing minimalista con hero, servicios y ultimos posts."""
-    recent_posts = await post_service.list_recent_published(db, limit=3)
+async def home(request: Request, db: DBSession):
+    """Landing corporativa con servicios, proyectos y últimos posts."""
+    recent_posts = (
+        []
+        if settings.DEV_PREVIEW_MODE
+        else await post_service.list_recent_published(db, limit=3)
+    )
     return templates.TemplateResponse(
         request,
         "public/home.html",
         {
-            "user": user,
             "recent_posts": recent_posts,
-            "page_title": settings.APP_NAME,
+            "page_title": f"{settings.APP_NAME} | Producto digital, IA y automatización",
             "page_description": settings.APP_DESCRIPTION,
         },
     )
 
 
 @router.get("/acerca", response_class=Response)
-async def about(request: Request, user: CurrentUser):
-    """Pagina 'Acerca de'."""
+async def about(request: Request):
+    """Página 'Acerca de'."""
     return templates.TemplateResponse(
         request,
         "public/about.html",
         {
-            "user": user,
             "page_title": f"Acerca de {settings.APP_NAME}",
-            "page_description": f"Conoce mas sobre {settings.APP_NAME}.",
+            "page_description": (
+                f"Conoce a {settings.APP_NAME}, una empresa de tecnología constituida "
+                f"en {settings.COMPANY_JURISDICTION}."
+            ),
         },
     )
 
@@ -50,25 +55,35 @@ async def about(request: Request, user: CurrentUser):
 async def blog_index(
     request: Request,
     db: DBSession,
-    user: CurrentUser,
     page: int = Query(1, ge=1),
 ):
-    """Listado paginado de posts publicados (10 por pagina)."""
+    """Listado paginado de posts publicados (10 por página)."""
     page_size = 10
-    posts, total = await post_service.list_published_posts(db, page=page, page_size=page_size)
+    posts, total = (
+        ([], 0)
+        if settings.DEV_PREVIEW_MODE
+        else await post_service.list_published_posts(db, page=page, page_size=page_size)
+    )
     total_pages = max(ceil(total / page_size), 1)
 
     return templates.TemplateResponse(
         request,
         "public/blog.html",
         {
-            "user": user,
             "posts": posts,
             "page": page,
             "total_pages": total_pages,
             "total": total,
+            "canonical_url": (
+                f"{settings.APP_URL}/blog?page={page}"
+                if page > 1
+                else f"{settings.APP_URL}/blog"
+            ),
             "page_title": f"Blog | {settings.APP_NAME}",
-            "page_description": f"Articulos del blog corporativo de {settings.APP_NAME}.",
+            "page_description": (
+                f"Artículos de {settings.APP_NAME} sobre producto digital, inteligencia "
+                "artificial, automatización y datos."
+            ),
         },
     )
 
@@ -78,10 +93,9 @@ async def blog_post(
     request: Request,
     slug: str,
     db: DBSession,
-    user: CurrentUser,
 ):
     """Detalle de un post publicado, con SEO y schema.org."""
-    post = await post_service.get_post_by_slug(db, slug)
+    post = None if settings.DEV_PREVIEW_MODE else await post_service.get_post_by_slug(db, slug)
     if post is None or not post.is_published:
         raise HTTPException(status_code=404, detail="Post no encontrado")
 
@@ -90,12 +104,12 @@ async def blog_post(
         request,
         "public/post.html",
         {
-            "user": user,
             "post": post,
             "canonical_url": canonical,
             "page_title": f"{post.title} | {settings.APP_NAME}",
             "page_description": post.excerpt or settings.APP_DESCRIPTION,
             "og_image": post.cover_image_url,
+            "og_type": "article",
         },
     )
 
@@ -106,16 +120,18 @@ async def robots_txt() -> str:
     return (
         "User-agent: *\n"
         "Allow: /\n"
-        "Disallow: /admin/\n"
-        "Disallow: /auth/\n"
         f"Sitemap: {settings.APP_URL}/sitemap.xml\n"
     )
 
 
 @router.get("/sitemap.xml", include_in_schema=False)
 async def sitemap_xml(db: DBSession) -> Response:
-    """Sitemap dinamico construido a partir de los posts publicados."""
-    posts, _ = await post_service.list_published_posts(db, page=1, page_size=1000)
+    """Sitemap dinámico construido a partir de los posts publicados."""
+    posts, _ = (
+        ([], 0)
+        if settings.DEV_PREVIEW_MODE
+        else await post_service.list_published_posts(db, page=1, page_size=1000)
+    )
     now_iso = datetime.utcnow().date().isoformat()
 
     urls: list[str] = [
@@ -144,12 +160,12 @@ async def healthz() -> dict[str, str]:
     return {"status": "ok"}
 
 
-# Render minimo de error 404 para HTMX (lo gestiona main via exception handler).
+# Render mínimo de error 404 (lo gestiona main mediante el exception handler).
 @router.get("/_404", include_in_schema=False)
-async def not_found_page(request: Request, user: CurrentUser) -> Response:
+async def not_found_page(request: Request) -> Response:
     return templates.TemplateResponse(
         request,
         "public/404.html",
-        {"user": user, "page_title": "No encontrado"},
+        {"page_title": "No encontrado"},
         status_code=status.HTTP_404_NOT_FOUND,
     )

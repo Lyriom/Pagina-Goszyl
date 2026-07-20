@@ -1,3 +1,3 @@
-"""Sistema A - Web corporativa de Gozsyl con blog y federacion hacia Sistema B."""
+"""Web corporativa de Gozsyl."""
 
 __version__ = "0.1.0"

@@ -1,13 +1,10 @@
-"""Modelos ORM del Sistema A."""
+"""Modelos ORM del blog público."""
 
 from app.models.post import Post, PostStatus
-from app.models.sync_log import FeaturedSyncLog
-from app.models.user import User, UserRole
+from app.models.user import User
 
 __all__ = [
     "User",
-    "UserRole",
     "Post",
     "PostStatus",
-    "FeaturedSyncLog",
 ]

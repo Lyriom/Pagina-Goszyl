@@ -1,1 +1,1 @@
-"""Servicios de la aplicacion (Vault, Sistema B, posts)."""
+"""Servicios de lectura del blog público."""
