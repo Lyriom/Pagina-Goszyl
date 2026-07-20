@@ -96,14 +96,3 @@ async def list_published_posts(
         .limit(page_size)
     )
     return list((await db.execute(stmt)).scalars().all()), total
-
-
-async def list_recent_published(db: AsyncSession, limit: int = 3) -> list[Post]:
-    stmt = (
-        select(Post)
-        .options(selectinload(Post.author))
-        .where(Post.status == PostStatus.PUBLISHED.value)
-        .order_by(Post.published_at.desc().nullslast(), Post.created_at.desc())
-        .limit(limit)
-    )
-    return list((await db.execute(stmt)).scalars().all())

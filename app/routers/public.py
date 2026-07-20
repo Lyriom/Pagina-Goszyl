@@ -17,18 +17,12 @@ router = APIRouter(tags=["public"])
 
 
 @router.get("/", response_class=Response)
-async def home(request: Request, db: DBSession):
-    """Landing corporativa con servicios, proyectos y últimos posts."""
-    recent_posts = (
-        []
-        if settings.DEV_PREVIEW_MODE
-        else await post_service.list_recent_published(db, limit=3)
-    )
+async def home(request: Request):
+    """Landing corporativa con servicios y proyectos."""
     return templates.TemplateResponse(
         request,
         "public/home.html",
         {
-            "recent_posts": recent_posts,
             "page_title": f"{settings.APP_NAME} | Producto digital, IA y automatización",
             "page_description": settings.APP_DESCRIPTION,
         },
